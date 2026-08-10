@@ -1,0 +1,11 @@
+---
+/**
+ * CodeBlock.astro — Renders code via client-side script to avoid Astro compiler {} issues.
+ */
+const { code = '', lang = '' } = Astro.props;
+const id = 'cb-' + Math.random().toString(36).slice(2, 9);
+---
+<pre class="p-4 text-sm font-mono text-zinc-800 dark:text-zinc-200 overflow-auto leading-relaxed"><code id={id} data-lang={lang}></code></pre>
+<script>
+  // Code content is injected via define:vars at build time
+</script>

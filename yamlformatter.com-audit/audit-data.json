@@ -1,0 +1,191 @@
+{
+  "summary": {
+    "health_score": 82,
+    "business_type": "Online Developer Tool / Web Application",
+    "domain": "yamlformatter.com",
+    "audit_date": "2026-08-10",
+    "audit_type": "offline_build_artifact",
+    "total_pages": 7,
+    "top_findings": [
+      "Blog pages missing BlogPosting JSON-LD schema",
+      "trailingSlash not explicitly configured in astro.config.mjs",
+      "Blog breadcrumb navigation hardcoded to yaml-syntax-guide",
+      "No llms.txt for AI crawler access",
+      "Blog posts thin content (500-650 words each)"
+    ],
+    "quick_wins": [
+      "Add BlogPosting JSON-LD to BlogLayout (30 min)",
+      "Set trailingSlash: 'never' in config (1 min)",
+      "Fix breadcrumb hardcoded link (15 min)",
+      "Add llms.txt to public/ (30 min)",
+      "Add About page for E-E-A-T (2 hrs)"
+    ]
+  },
+  "categories": [
+    {
+      "name": "Technical SEO",
+      "score": 88,
+      "what_works": [
+        "robots.txt with absolute sitemap URL",
+        "Valid sitemap-index.xml and sitemap-0.xml with 7 URLs",
+        "All pages have canonical tags",
+        "No trailing slash inconsistency in internal links",
+        "HTML lang attribute set to 'en'",
+        "HTTPS configured"
+      ],
+      "findings": [
+        {
+          "title": "trailingSlash not explicitly configured",
+          "severity": "Medium",
+          "description": "astro.config.mjs does not set trailingSlash: 'never'. Sitemap and canonical URLs all end with '/' (Astro default). Internal links do not have trailing slashes. Currently consistent but risky if server config differs.",
+          "recommendation": "Add trailingSlash: 'never' to astro.config.mjs to explicitly control URL format."
+        }
+      ]
+    },
+    {
+      "name": "On-Page SEO",
+      "score": 92,
+      "what_works": [
+        "All 7 pages have title (40-60 chars), description (140-160 chars), and H1",
+        "Complete OG tags on all pages (title, description, image, url)",
+        "Privacy page correctly set to noindex",
+        "17 internal links on homepage, 0 with trailing slashes",
+        "Clean heading hierarchy: H1(1) → H2(15) → H3(46) on homepage"
+      ],
+      "findings": [
+        {
+          "title": "Privacy page title too short (31 chars)",
+          "severity": "Low",
+          "description": "Privacy page title is 31 chars (below 40 minimum). However, page is noindex so impact is minimal.",
+          "recommendation": "No action needed since page is noindex."
+        },
+        {
+          "title": "Blog breadcrumb hardcoded",
+          "severity": "Medium",
+          "description": "BlogLayout.astro has 'Blog' breadcrumb link hardcoded to /blog/yaml-syntax-guide instead of a dynamic or generic blog index path.",
+          "recommendation": "Change to accept props or use a generic /blog/ path."
+        }
+      ]
+    },
+    {
+      "name": "Content Quality",
+      "score": 78,
+      "what_works": [
+        "Homepage has substantial content (3528 words)",
+        "Tool pages have good content (1500-1700 words)",
+        "Privacy policy present",
+        "Clear data safety messaging (100% client-side)"
+      ],
+      "findings": [
+        {
+          "title": "Blog posts are thin content",
+          "severity": "Medium",
+          "description": "Three blog posts range from 557-634 words. Recommended minimum is 800-1200 words for competitive ranking.",
+          "recommendation": "Expand each blog post with additional sections, examples, and practical tips."
+        },
+        {
+          "title": "No About page",
+          "severity": "Medium",
+          "description": "Site lacks an About page, which weakens E-E-A-T trust signals.",
+          "recommendation": "Create /about/ page with project background, author info, and technical details."
+        }
+      ]
+    },
+    {
+      "name": "Schema & Structured Data",
+      "score": 75,
+      "what_works": [
+        "Homepage has rich schema: WebApplication, SoftwareApplication, FAQPage (12 Qs), HowTo (3 steps), Organization, BreadcrumbList",
+        "Tool pages (json-to-yaml, yaml-to-json) have WebApplication + HowTo + FAQPage"
+      ],
+      "findings": [
+        {
+          "title": "Blog pages have no JSON-LD",
+          "severity": "High",
+          "description": "All 3 blog pages lack any structured data (no BlogPosting, Article, or BreadcrumbList schema).",
+          "recommendation": "Add BlogPosting JSON-LD to BlogLayout.astro with headline, datePublished, author, and description."
+        }
+      ]
+    },
+    {
+      "name": "Performance",
+      "score": 85,
+      "what_works": [
+        "Static output mode, no SSR overhead",
+        "Reasonable code splitting (3 chunks)",
+        "No third-party tracking scripts",
+        "Pure client-side processing, no API latency"
+      ],
+      "findings": [
+        {
+          "title": "ToolPanel chunk is large (445 kB)",
+          "severity": "Low",
+          "description": "The ToolPanel JavaScript chunk is 445 kB (142 kB gzipped). Contains CodeMirror editor and YAML parser.",
+          "recommendation": "Consider lazy loading the ToolPanel component. Already using client:idle which helps."
+        }
+      ]
+    },
+    {
+      "name": "AI Search Readiness",
+      "score": 60,
+      "what_works": [
+        "Rich FAQPage schema helps AI citation",
+        "Clear tool descriptions suitable for AI answers",
+        "Consistent brand naming"
+      ],
+      "findings": [
+        {
+          "title": "No llms.txt file",
+          "severity": "Medium",
+          "description": "Site does not provide llms.txt for AI crawlers (ChatGPT, Perplexity) to understand site purpose and content scope.",
+          "recommendation": "Create public/llms.txt with site description, content scope, and usage terms."
+        }
+      ]
+    },
+    {
+      "name": "Images",
+      "score": 100,
+      "what_works": [
+        "No <img> tags on the site (pure tool site), no alt text issues"
+      ],
+      "findings": []
+    }
+  ],
+  "action_plan": {
+    "phases": [
+      {
+        "name": "Phase 1: Critical & High Fixes",
+        "timeframe": "Week 1",
+        "items": [
+          "Add BlogPosting JSON-LD to BlogLayout.astro",
+          "Set trailingSlash: 'never' in astro.config.mjs",
+          "Fix blog breadcrumb hardcoded link"
+        ]
+      },
+      {
+        "name": "Phase 2: Medium Priority",
+        "timeframe": "Weeks 2-3",
+        "items": [
+          "Create About page",
+          "Expand blog content to 800-1200 words each",
+          "Add llms.txt",
+          "Add BreadcrumbList schema to blog pages"
+        ]
+      },
+      {
+        "name": "Phase 3: Post-Deployment",
+        "timeframe": "Month 2+",
+        "items": [
+          "Verify redirects (http→https, www→bare domain)",
+          "Submit sitemap to Google Search Console",
+          "Add Google Analytics",
+          "Expand blog content matrix"
+        ]
+      }
+    ]
+  },
+  "artifacts": {
+    "findings_dir": "findings/",
+    "screenshots_dir": "screenshots/"
+  }
+}

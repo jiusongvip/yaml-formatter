@@ -1,0 +1,70 @@
+---
+---
+
+<section id="yaml-syntax" class="py-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+  <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-center text-zinc-900 dark:text-zinc-50">
+    YAML Syntax Cheat Sheet
+  </h2>
+  <p class="mt-4 text-center text-zinc-500 dark:text-zinc-400">A quick reference for YAML data types, structures, and syntax rules.</p>
+  <div class="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
+    {[
+      { title: 'Scalars (Strings)', items: [
+        { label: 'Plain', code: 'key: value', note: 'No quotes needed for simple strings' },
+        { label: 'Single-quoted', code: "key: 'value with spaces'", note: 'Literal, no escape sequences processed' },
+        { label: 'Double-quoted', code: 'key: "Line 1\\nLine 2"', note: 'Escape sequences (\\n, \\t, \\") work' },
+        { label: 'Literal block', code: 'key: |\n  line 1\n  line 2', note: 'Preserves newlines (|) ' },
+        { label: 'Folded block', code: 'key: >\n  long text\n  wrapped', note: 'Folds newlines to spaces (>)' },
+      ]},
+      { title: 'Numbers & Booleans', items: [
+        { label: 'Integer', code: 'count: 42', note: 'Plain integer' },
+        { label: 'Float', code: 'price: 19.99', note: 'Decimal number' },
+        { label: 'Scientific', code: 'avogadro: 6.02e23', note: 'Scientific notation' },
+        { label: 'Boolean true', code: 'enabled: true', note: 'true / True / TRUE are all valid (1.2)' },
+        { label: 'Boolean false', code: 'debug: false', note: 'false / False / FALSE are all valid (1.2)' },
+        { label: 'Null', code: 'value: null', note: 'null / Null / NULL or ~ (tilde)' },
+      ]},
+      { title: 'Sequences (Lists)', items: [
+        { label: 'Block list', code: 'fruits:\n  - apple\n  - banana\n  - cherry', note: 'Dash + space for each item' },
+        { label: 'Flow list', code: 'fruits: [apple, banana, cherry]', note: 'Bracket syntax, inline' },
+        { label: 'Nested list', code: 'matrix:\n  - [1, 2, 3]\n  - [4, 5, 6]', note: 'Lists within lists' },
+        { label: 'List of objects', code: 'people:\n  - name: Alice\n    age: 30\n  - name: Bob\n    age: 25', note: 'Each item is a mapping' },
+      ]},
+      { title: 'Mappings (Dictionaries)', items: [
+        { label: 'Block mapping', code: 'person:\n  name: John\n  age: 30', note: 'Indented key-value pairs' },
+        { label: 'Flow mapping', code: 'person: {name: John, age: 30}', note: 'Curly brace syntax, inline' },
+        { label: 'Nested mapping', code: 'server:\n  host: localhost\n  ports:\n    http: 80\n    https: 443', note: 'Deep nesting through indentation' },
+      ]},
+      { title: 'Anchors & Aliases', items: [
+        { label: 'Define anchor', code: 'defaults: &defaults\n  timeout: 30\n  retries: 3', note: '&name defines an anchor' },
+        { label: 'Reference alias', code: 'service1:\n  <<: *defaults\n  name: api', note: '*name references the anchor' },
+        { label: 'Merge key', code: '<<: *defaults', note: '<< merges all keys from an alias' },
+      ]},
+      { title: 'Multi-Document & Directives', items: [
+        { label: 'Multi-document', code: '---\ndoc1: value\n---\ndoc2: value', note: '--- separates documents' },
+        { label: 'End of document', code: '...', note: '... marks end of document (optional)' },
+        { label: 'YAML directive', code: '%YAML 1.2\n---', note: 'Specifies YAML version' },
+        { label: 'TAG directive', code: '%TAG !e! tag:example.com:\n---', note: 'Custom tag shorthand' },
+        { label: 'Explicit tag', code: 'value: !!str 123', note: '!!type forces a specific type' },
+      ]},
+    ].map(({title, items}) => (
+      <div class="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
+        <div class="px-5 py-3 bg-zinc-50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800">
+          <h3 class="font-semibold text-sm text-zinc-900 dark:text-zinc-100">{title}</h3>
+        </div>
+        <div class="divide-y divide-zinc-100 dark:divide-zinc-800/50">
+          {items.map(({label, code, note}) => (
+            <div class="px-5 py-3 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30 transition-colors">
+              <div class="flex items-start justify-between gap-4">
+                <div class="min-w-0">
+                  <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">{label}</span>
+                  <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{note}</div>
+                </div>
+              </div>
+              <pre class="mt-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-700/60 text-xs font-mono text-zinc-700 dark:text-zinc-300 overflow-x-auto leading-relaxed">{code}</pre>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

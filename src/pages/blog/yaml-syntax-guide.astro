@@ -1,0 +1,214 @@
+---
+import BlogLayout from '../../layouts/BlogLayout.astro';
+
+const faqs = [
+  { question: 'Is YAML case-sensitive?', answer: 'Yes. YAML keys and values are case-sensitive. Name: Alice and name: Alice are different keys. This is a common source of bugs when working with Kubernetes or Docker Compose configurations.' },
+  { question: 'What is the maximum nesting depth in YAML?', answer: 'The YAML specification doesn\'t define a maximum depth, but most parsers limit it to prevent stack overflow. Python\'s PyYAML defaults to 100 levels. In practice, keep nesting under 5-6 levels for readability.' },
+  { question: 'Can I use comments in YAML?', answer: 'Yes. YAML supports single-line comments starting with #. Comments can appear on their own line or after a value. Block comments (multi-line) are not supported — each line needs its own #.' },
+  { question: 'What\'s the difference between | and > in YAML?', answer: 'The pipe | preserves literal newlines (each line break is kept). The greater-than > folds newlines into spaces (paragraph style). Use | for code blocks and > for long descriptions.' },
+  { question: 'How do I represent a date in YAML?', answer: 'YAML automatically recognizes ISO 8601 date formats: 2024-01-15 or 2024-01-15T10:30:00Z. To keep a date-like value as a string, wrap it in quotes: version: "2024-01".' },
+];
+---
+
+<BlogLayout
+  title="YAML Syntax Guide: A Complete Reference for Beginners"
+  description="Learn YAML syntax from the ground up. Covering scalars, mappings, sequences, anchors, aliases, and best practices for clean YAML config files."
+  slug="yaml-syntax-guide"
+  faqs={faqs}
+>
+  <span slot="breadcrumb">YAML Syntax Guide</span>
+  <h1 slot="title" class="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">YAML Syntax Guide: A Complete Reference</h1>
+
+  <p class="text-lg text-zinc-500 dark:text-zinc-400 lead">YAML (YAML Ain't Markup Language) is the most popular configuration language in the DevOps world. From Kubernetes manifests to CI/CD pipelines, understanding YAML syntax is essential for every modern developer.</p>
+
+  <h2>What Makes YAML Different?</h2>
+  <p>Unlike JSON or XML, YAML uses <strong>indentation</strong> (spaces, never tabs) to represent structure. This makes it incredibly readable for humans but also means a single misplaced space can break your entire file. That's why our <a href="/#formatter">YAML formatter</a> is so valuable — it catches these issues instantly.</p>
+
+  <h2>YAML Basic Building Blocks</h2>
+
+  <h3>Scalars (Simple Values)</h3>
+  <p>Scalars are the simplest YAML values: strings, numbers, booleans, and null.</p>
+  <pre><code># Strings (quotes are optional unless containing special characters)
+name: John Doe
+description: "Value with: special chars"
+multiline: |
+  This text spans
+  multiple lines
+  with preserved newlines.
+folded: >
+  This text will be
+  folded into a single
+  line with spaces.
+
+# Numbers
+age: 30
+price: 19.99
+scientific: 1.2e3
+
+# Booleans (YAML 1.2: only true/false)
+enabled: true
+debug: false
+
+# Null
+middle_name: null</code></pre>
+
+  <h3>Mappings (Key-Value Pairs)</h3>
+  <p>Mappings are the core of YAML — they map keys to values using colons.</p>
+  <pre><code>person:
+  name: Alice
+  age: 28
+  address:
+    street: 123 Main St
+    city: San Francisco
+    zip: 94105</code></pre>
+
+  <h3>Sequences (Lists/Arrays)</h3>
+  <p>Sequences are ordered lists, denoted by dashes.</p>
+  <pre><code># Simple list
+fruits:
+  - apple
+  - banana
+  - orange
+
+# List of objects
+users:
+  - name: Alice
+    role: admin
+  - name: Bob
+    role: developer
+
+# Inline list syntax
+tags: [yaml, devops, kubernetes]</code></pre>
+
+  <h2>Advanced YAML Features</h2>
+
+  <h3>Anchors and Aliases</h3>
+  <p>Anchors (<code>&amp;</code>) let you mark a node for reuse. Aliases (<code>*</code>) reference that node. This is perfect for DRY configuration.</p>
+  <pre><code>defaults: &defaults
+  timeout: 30
+  retries: 3
+
+service-a:
+  <<: *defaults
+  name: service-a
+
+service-b:
+  <<: *defaults
+  name: service-b
+  timeout: 60  # Override</code></pre>
+
+  <h3>Multi-Document Files</h3>
+  <p>YAML files can contain multiple documents separated by <code>---</code>. This is common in Kubernetes manifests and Ansible playbooks.</p>
+  <pre><code>---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment</code></pre>
+
+  <h3>Data Types and Tags</h3>
+  <p>YAML supports explicit type tags using <code>!!</code> notation, though they're rarely needed in practice.</p>
+  <pre><code>explicit-string: !!str 2024
+explicit-int: !!int "42"
+explicit-float: !!float "3.14"
+binary: !!binary R0lGODdh...</code></pre>
+
+  <h2>Common YAML Pitfalls</h2>
+  <ul>
+    <li><strong>Tabs vs Spaces:</strong> YAML <em>never</em> allows tabs for indentation. Use spaces only.</li>
+    <li><strong>Inconsistent Indentation:</strong> Pick a consistent indent level (2 or 4 spaces) and stick with it.</li>
+    <li><strong>Colon Spacing:</strong> Always add a space after the colon: <code>key: value</code> not <code>key:value</code>.</li>
+    <li><strong>Boolean Ambiguity:</strong> YAML 1.1 accepts <code>yes/no/on/off</code> as booleans. YAML 1.2 only accepts <code>true/false</code>. Always use <code>true/false</code> to avoid surprises.</li>
+    <li><strong>Multiple Documents:</strong> Remember that <code>---</code> starts a new document and <code>...</code> ends one.</li>
+  </ul>
+
+  <h2>YAML in Practice</h2>
+  <p>YAML is the backbone of modern infrastructure configuration:</p>
+  <ul>
+    <li><strong>Kubernetes:</strong> Every resource (Deployment, Service, ConfigMap) is defined in YAML.</li>
+    <li><strong>Docker Compose:</strong> <code>docker-compose.yml</code> defines multi-container applications.</li>
+    <li><strong>Ansible:</strong> Playbooks and inventory files use YAML.</li>
+    <li><strong>GitHub Actions:</strong> Workflow definitions in <code>.github/workflows/*.yml</code>.</li>
+    <li><strong>OpenAPI/Swagger:</strong> API specifications in YAML format.</li>
+    <li><strong>Helm Charts:</strong> Kubernetes package manager uses YAML templates.</li>
+  </ul>
+
+  <h2>YAML vs JSON: When to Use Which</h2>
+  <p>YAML and JSON are closely related — YAML is actually a superset of JSON, meaning every valid JSON file is also valid YAML. However, they serve different purposes in practice.</p>
+  <p><strong>Choose YAML when:</strong> you need human-readable configuration files, comments for documentation, or anchors/aliases for DRY configs. YAML is the standard for Kubernetes, Docker Compose, CI/CD pipelines, and Ansible.</p>
+  <p><strong>Choose JSON when:</strong> you're building APIs, exchanging data between systems, or working with JavaScript applications. JSON is faster to parse programmatically and has unambiguous type handling.</p>
+  <p>For a deeper comparison including TOML, check out our <a href="/blog/yaml-vs-json-vs-toml">YAML vs JSON vs TOML guide</a>.</p>
+
+  <h2>YAML 1.2 vs 1.1: Key Differences</h2>
+  <p>Most tools now follow YAML 1.2 (released 2009), but some older parsers still use YAML 1.1. The differences matter when you encounter unexpected type coercion:</p>
+  <ul>
+    <li><strong>Booleans:</strong> YAML 1.1 accepts <code>yes/no/on/off/true/false</code>. YAML 1.2 only accepts <code>true/false</code>. Always use <code>true/false</code> for compatibility.</li>
+    <li><strong>Octal numbers:</strong> YAML 1.1 uses <code>0777</code> prefix. YAML 1.2 uses <code>0o777</code> prefix.</li>
+    <li><strong>String "NO"/"Yes":</strong> In YAML 1.1, these are parsed as booleans. In YAML 1.2, they remain strings.</li>
+    <li><strong>Null values:</strong> Both versions accept <code>null</code> and <code>~</code>. YAML 1.1 also treats empty values as null.</li>
+  </ul>
+  <p>When in doubt, quote ambiguous values: <code>answer: "yes"</code> ensures it's always treated as a string regardless of parser version.</p>
+
+  <h2>YAML Best Practices</h2>
+  <ul>
+    <li><strong>Always use spaces for indentation.</strong> Configure your editor to insert spaces (2 or 4 per level). Never mix tabs and spaces.</li>
+    <li><strong>Quote strings that could be misinterpreted.</strong> Values like <code>"true"</code>, <code>"1.0"</code>, <code>"NO"</code>, or version numbers like <code>"1.20"</code> should be quoted to prevent type coercion.</li>
+    <li><strong>Use comments liberally.</strong> YAML supports <code>#</code> comments. Use them to explain non-obvious configuration choices.</li>
+    <li><strong>Keep nesting shallow.</strong> Deeply nested YAML is hard to read and error-prone. Flatten structures where possible using dot notation or separate files.</li>
+    <li><strong>Use anchors for repeated blocks.</strong> Instead of copying configuration, use <code>&amp;anchor</code> and <code>*alias</code> with merge keys <code>&lt;&lt;:</code>.</li>
+    <li><strong>Validate before committing.</strong> Use our <a href="/#formatter">YAML validator</a> to catch syntax errors before pushing configuration to production.</li>
+    <li><strong>Use descriptive key names.</strong> Prefer <code>database_connection_timeout</code> over <code>db_to</code>. Clarity beats brevity in configuration.</li>
+  </ul>
+
+  <h2>History and Evolution of YAML</h2>
+  <p>YAML was created by Clark Evans in 2001, with the first release (YAML 1.0) published in 2004. The name was originally "Yet Another Markup Language" but was later changed to "YAML Ain't Markup Language" to emphasize its data-oriented nature. The language was designed to address perceived shortcomings in XML and other configuration formats of the time.</p>
+  <p>YAML 1.1 arrived in 2005 and became the version implemented by most early parsers, including Python's PyYAML. YAML 1.2, released in 2009, was a significant cleanup that removed ambiguous type coercion rules (like the Norway Problem with <code>yes/no</code> being parsed as booleans). Most modern tools now support YAML 1.2, though some legacy systems still use 1.1 behavior.</p>
+  <p>The adoption of YAML accelerated dramatically with the rise of DevOps and cloud-native computing. Docker chose YAML for Compose files, Kubernetes adopted it for all resource manifests, and CI/CD platforms like GitHub Actions and GitLab CI made YAML the standard for pipeline definitions. Today, YAML is arguably the most widely used configuration language in software infrastructure.</p>
+
+  <h2>YAML Tools and Libraries</h2>
+  <p>Every major programming language has YAML support. Here are the most widely used libraries:</p>
+  <ul>
+    <li><strong>Python:</strong> PyYAML (YAML 1.1) and ruamel.yaml (YAML 1.2). PyYAML is the most common; ruamel.yaml preserves comments and formatting.</li>
+    <li><strong>JavaScript/TypeScript:</strong> js-yaml is the standard parser. <code>yaml</code> (by Eemeli Aro) is a modern alternative with YAML 1.2 support and round-trip preservation.</li>
+    <li><strong>Go:</strong> <code>gopkg.in/yaml.v3</code> is the official Go YAML package, used throughout the Kubernetes ecosystem.</li>
+    <li><strong>Rust:</strong> <code>serde_yaml</code> integrates with the serde serialization framework.</li>
+    <li><strong>Java:</strong> SnakeYAML is the most common; Jackson YAML provides an alternative.</li>
+    <li><strong>Ruby:</strong> Psych is built into the standard library.</li>
+  </ul>
+  <p>For command-line work, <code>yq</code> (by Mike Farah) is an essential tool — it's like <code>jq</code> but for YAML files. You can query, filter, and transform YAML directly from the terminal. Combined with our <a href="/#formatter">online YAML formatter</a>, you have options for both local and browser-based YAML processing.</p>
+
+  <h2>YAML Security Considerations</h2>
+  <p>YAML deserialization can be a security risk if you parse untrusted input. Many YAML libraries support arbitrary object construction through tags like <code>!!python/object</code> or <code>!!java.lang.Runtime</code>. An attacker could craft a YAML file that executes arbitrary code when parsed.</p>
+  <p>To stay safe:</p>
+  <ul>
+    <li><strong>Never parse untrusted YAML with unsafe loaders.</strong> In Python, use <code>yaml.safe_load()</code> instead of <code>yaml.load()</code>. In Ruby, use <code>YAML.safe_load</code>.</li>
+    <li><strong>Validate YAML before processing.</strong> Use our <a href="/#formatter">YAML validator</a> to check syntax before feeding files into production systems.</li>
+    <li><strong>Pin parser versions.</strong> Different YAML library versions may interpret ambiguous values differently. Lock your dependency versions.</li>
+    <li><strong>Be cautious with <code>!!</code> tags.</strong> If your use case doesn't require explicit type tags, configure your parser to reject them.</li>
+  </ul>
+  <p>The YAML 1.2 specification was designed with security in mind — it removed many of the implicit type resolutions that made YAML 1.1 vulnerable to unexpected behavior. If you're choosing a YAML library, prefer one that defaults to YAML 1.2 semantics.</p>
+
+  <h2>Frequently Asked Questions</h2>
+
+  <h3>Is YAML case-sensitive?</h3>
+  <p>Yes. YAML keys and values are case-sensitive. <code>Name: Alice</code> and <code>name: Alice</code> are different keys. This is a common source of bugs when working with Kubernetes or Docker Compose configurations.</p>
+
+  <h3>What is the maximum nesting depth in YAML?</h3>
+  <p>The YAML specification doesn't define a maximum depth, but most parsers limit it to prevent stack overflow. Python's PyYAML defaults to 100 levels. In practice, keep nesting under 5-6 levels for readability.</p>
+
+  <h3>Can I use comments in YAML?</h3>
+  <p>Yes. YAML supports single-line comments starting with <code>#</code>. Comments can appear on their own line or after a value. Block comments (multi-line) are not supported — each line needs its own <code>#</code>.</p>
+
+  <h3>What's the difference between | and &gt; in YAML?</h3>
+  <p>The pipe <code>|</code> preserves literal newlines (each line break is kept). The greater-than <code>&gt;</code> folds newlines into spaces (paragraph style). Use <code>|</code> for code blocks and <code>&gt;</code> for long descriptions.</p>
+
+  <h3>How do I represent a date in YAML?</h3>
+  <p>YAML automatically recognizes ISO 8601 date formats: <code>2024-01-15</code> or <code>2024-01-15T10:30:00Z</code>. To keep a date-like value as a string, wrap it in quotes: <code>version: "2024-01"</code>.</p>
+
+  <h2>Quick Format Any YAML</h2>
+  <p>Writing YAML by hand? Paste it into our <a href="/#formatter">free YAML formatter</a> for instant validation, formatting, and JSON conversion — all processed locally in your browser with zero server upload. You can also explore <a href="/blog/yaml-common-errors">common YAML errors</a> to avoid costly mistakes in your configurations.</p>
+</BlogLayout>

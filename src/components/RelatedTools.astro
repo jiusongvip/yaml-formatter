@@ -1,0 +1,27 @@
+---
+---
+
+<section id="related" class="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+  <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-center text-zinc-900 dark:text-zinc-50">
+    Related YAML Tools & Resources
+  </h2>
+  <p class="mt-4 text-center text-zinc-500 dark:text-zinc-400">Essential tools and references for working with YAML in your daily workflow.</p>
+  <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {[
+      { title: 'YAML Validator', desc: 'Validate YAML syntax with line-level error reporting and instant feedback.', href: '#formatter' },
+      { title: 'YAML to JSON Converter', desc: 'Convert YAML configuration to JSON for API consumption or data processing.', href: '#formatter' },
+      { title: 'yq (CLI Tool)', desc: 'A lightweight command-line YAML processor. jq for YAML. Filter, query, and transform YAML files.', href: 'https://github.com/mikefarah/yq', external: true },
+      { title: 'yamllint', desc: 'A linter for YAML files. Checks for syntax validity, key repetition, and cosmetic issues like line length and trailing spaces.', href: 'https://github.com/adrienverge/yamllint', external: true },
+      { title: 'YAML Language Server', desc: 'Provides YAML language support (validation, completion, hover) for VS Code, Neovim, and other editors.', href: 'https://github.com/redhat-developer/yaml-language-server', external: true },
+      { title: 'Official YAML Spec', desc: 'The authoritative YAML 1.2 specification. Covers all syntax rules, type systems, and processing models.', href: 'https://yaml.org/spec/1.2.2/', external: true },
+    ].map(({title, desc, href, external}) => (
+      <a href={href} class="block p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 hover:border-emerald-200 dark:hover:border-emerald-700 transition-colors group" {...(external ? { target: '_blank', rel: 'noopener' } : {})}>
+        <h3 class="font-semibold text-sm text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+          {title}
+          {external && <span class="inline-block ml-1 text-zinc-300 dark:text-zinc-600">&#8599;</span>}
+        </h3>
+        <p class="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">{desc}</p>
+      </a>
+    ))}
+  </div>
+</section>

@@ -1,0 +1,35 @@
+---
+---
+
+<section id="glossary" class="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+  <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-center text-zinc-900 dark:text-zinc-50">
+    YAML Glossary
+  </h2>
+  <p class="mt-4 text-center text-zinc-500 dark:text-zinc-400">Essential YAML terminology every developer should know.</p>
+  <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+    {[
+      { term: 'Anchor', def: 'A marker (&name) that labels a YAML node so it can be referenced elsewhere in the same document. Used with aliases to avoid repeating configuration blocks.' },
+      { term: 'Alias', def: 'A reference (*name) to an anchor defined elsewhere in the document. The alias is replaced by the anchored node during parsing. Often used with the merge key (<<) to inherit default values.' },
+      { term: 'Block Style', def: 'YAML syntax that uses indentation and newlines to represent structure. Block style is the default and preferred format for configuration files because of its readability.' },
+      { term: 'Directive', def: 'A YAML instruction that begins with %. The most common is %YAML 1.2, which specifies the YAML version for the document. Directives must appear at the top of the document before any content.' },
+      { term: 'Document', def: 'A single YAML data structure. Multiple documents can exist in one file, separated by --- on its own line. Each document is parsed independently.' },
+      { term: 'Flow Style', def: 'YAML syntax that uses brackets and commas (like JSON) to represent structure inline. Flow style is compact but less readable for complex data. Use {key: value} for mappings and [a, b, c] for sequences.' },
+      { term: 'Folded Block Scalar', def: 'A multi-line string introduced by >. Newlines within the block are folded into spaces, making it suitable for long paragraphs of text that should wrap naturally.' },
+      { term: 'Indentation', def: 'YAML uses spaces (never tabs) to indicate nesting. All items at the same level must have identical indentation. The most common convention is 2 spaces per level.' },
+      { term: 'Key-Value Pair', def: 'The fundamental unit of a YAML mapping. Written as key: value, where the colon must be followed by a space. Keys are always strings; values can be any YAML type.' },
+      { term: 'Literal Block Scalar', def: 'A multi-line string introduced by |. Newlines within the block are preserved exactly as written. Common in shell scripts, SQL queries, and multi-line configuration values.' },
+      { term: 'Mapping', def: 'A collection of key-value pairs, equivalent to a dictionary, hash, or object in other languages. Mappings can be nested to any depth through indentation.' },
+      { term: 'Merge Key', def: 'The << key used to merge all keys from an aliased mapping into the current mapping. Commonly used with YAML anchors to inherit default configuration values.' },
+      { term: 'Scalar', def: 'A single atomic value in YAML: a string, number, boolean, or null. Scalars are the leaf nodes of the YAML document tree. Strings are the most common scalar type.' },
+      { term: 'Schema', def: 'The set of rules a YAML parser uses to determine how unquoted values are interpreted. YAML has three schemas: Failsafe (strict), JSON (JSON-compatible), and Core (default, most permissive).' },
+      { term: 'Sequence', def: 'An ordered list of values, equivalent to an array or list in other languages. In block style, each item is prefixed with a dash and space (- ). In flow style, items are enclosed in brackets.' },
+      { term: 'Tag', def: 'An explicit type annotation prefixed with !!. For example, !!str 123 forces the value 123 to be treated as a string instead of an integer. Tags override the default type inference.' },
+      { term: 'YAML 1.1 vs 1.2', def: 'YAML 1.2 (2009) is the latest specification. Key differences from 1.1: booleans only accept true/false (not yes/no/on/off), octal numbers require 0o prefix (not just 0), and the Core schema is JSON-compatible by default.' },
+    ].map(({term, def}) => (
+      <div class="p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 hover:border-emerald-200 dark:hover:border-emerald-700 transition-colors">
+        <dt class="font-semibold text-sm text-emerald-700 dark:text-emerald-300">{term}</dt>
+        <dd class="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">{def}</dd>
+      </div>
+    ))}
+  </div>
+</section>

@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+/* Smooth theme transition */
+html {
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+html.dark {
+  color-scheme: dark;
+}
+
+/* Section alternation for visual rhythm */
+section:nth-of-type(even) {
+  background: linear-gradient(to bottom, transparent, rgb(249 250 251 / 0.5), transparent);
+}
+.dark section:nth-of-type(even) {
+  background: linear-gradient(to bottom, transparent, rgb(9 9 11 / 0.5), transparent);
+}
+
+/* Scroll-to-top button */
+#scroll-top {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translateY(12px);
+}
+#scroll-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* YAML code block syntax highlighting */
+pre code,
+pre {
+  tab-size: 2;
+}
+/* Comment lines */
+pre .cmt,
+pre:not([class]) span.cmt {
+  color: #6b7280;
+}
+.dark pre .cmt,
+.dark pre:not([class]) span.cmt {
+  color: #6b7280;
+}
+
+/* FAQ accordion smooth animation */
+.faq-answer {
+  animation: faqIn 0.2s ease;
+}
+@keyframes faqIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* CodeMirror overrides for better dark mode */
+.dark .cm-editor {
+  background: transparent;
+}
+.dark .cm-editor .cm-content {
+  caret-color: #e4e4e7;
+}
+.dark .cm-editor .cm-activeLine {
+  background: rgba(255,255,255,0.04) !important;
+}
+
+/* Better scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}

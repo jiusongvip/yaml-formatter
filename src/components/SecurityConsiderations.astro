@@ -1,0 +1,27 @@
+---
+---
+
+<section id="security" class="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+  <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-center text-zinc-900 dark:text-zinc-50">
+    YAML Security Considerations
+  </h2>
+  <p class="mt-4 text-center text-zinc-500 dark:text-zinc-400">Important security awareness points when working with YAML, especially from untrusted sources.</p>
+  <div class="mt-10 space-y-6">
+    {[
+      { title: 'The Norway Problem', desc: 'In YAML 1.1, unquoted country codes like NO (Norway) are interpreted as boolean false. This caused real-world bugs where country lists silently dropped entries. Always quote ambiguous strings, especially two-letter codes, version numbers like 1.0, and boolean-like words (yes, no, on, off). YAML 1.2 fixed most of these, but many tools still use the 1.1 parser.' },
+      { title: 'Billion Laughs Attack', desc: 'YAML anchors and aliases can be used to create exponential expansion attacks. A small YAML payload with nested aliases can expand to gigabytes of data during parsing, causing denial of service. Production YAML parsers should limit alias expansion depth. Our client-side formatter has built-in safeguards against this.' },
+      { title: 'Arbitrary Code Execution', desc: 'Some YAML libraries (especially in Python and Ruby) support deserialization of custom objects via YAML tags (!!python/object). This can lead to remote code execution if untrusted YAML is parsed with unsafe loaders. Always use safe loading functions (yaml.safe_load in Python) and never use yaml.load on untrusted input.' },
+      { title: 'Secret Leakage in Configs', desc: 'YAML configuration files frequently contain API keys, database passwords, and access tokens. These should never be committed to version control. Use environment variables, secret management services (Vault, AWS Secrets Manager), or Kubernetes Secrets. Our formatter processes everything locally, but be mindful of where you paste sensitive data on shared screens.' },
+    ].map(({title, desc}) => (
+      <div class="flex gap-4 p-5 rounded-2xl border border-amber-200/80 dark:border-amber-800/50 bg-amber-50/30 dark:bg-amber-950/10">
+        <div class="shrink-0 w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+          <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div>
+          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
+          <p class="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">{desc}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

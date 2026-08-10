@@ -1,0 +1,60 @@
+---
+---
+
+<section id="examples-gallery" class="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+  <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-center text-zinc-900 dark:text-zinc-50">
+    See the Formatter in Action
+  </h2>
+  <p class="mt-4 text-center text-zinc-500 dark:text-zinc-400">Real examples of how our YAML formatter transforms messy configuration files into clean, readable code.</p>
+  <div class="mt-10 space-y-8">
+    {[
+      {
+        title: 'Fix Inconsistent Indentation',
+        before: 'apiVersion: apps/v1\nkind: Deployment\nmetadata:\n name: my-app\nspec:\n   replicas: 3\n  selector:\n    matchLabels:\n      app: my-app\n template:\n   metadata:\n     labels:\n        app: my-app',
+        after: 'apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: my-app\nspec:\n  replicas: 3\n  selector:\n    matchLabels:\n      app: my-app\n  template:\n    metadata:\n      labels:\n        app: my-app',
+        note: 'Mixed 2-space and 3-space indentation is normalized to consistent 2-space indentation. All nesting levels are properly aligned.'
+      },
+      {
+        title: 'Normalize Tabs to Spaces',
+        before: 'server:\n\thost: localhost\n\tport: 8080\n\tdatabase:\n\t\tname: mydb\n\t\tuser: admin',
+        after: 'server:\n  host: localhost\n  port: 8080\n  database:\n    name: mydb\n    user: admin',
+        note: 'Tab characters are flagged as errors and converted to spaces. The formatter shows the exact line where tabs were found.'
+      },
+      {
+        title: 'Reformat Dense Inline to Readable Block',
+        before: 'person: {name: John Doe, age: 30, address: {street: "123 Main St", city: Springfield, zip: "12345"}, hobbies: [reading, hiking, coding]}',
+        after: 'person:\n  name: John Doe\n  age: 30\n  address:\n    street: "123 Main St"\n    city: Springfield\n    zip: "12345"\n  hobbies:\n    - reading\n    - hiking\n    - coding',
+        note: 'Inline flow style is expanded into readable block style. Nested objects and arrays are properly indented at each level.'
+      },
+      {
+        title: 'Clean Up Missing Colons and Spacing',
+        before: 'name:web\nversion 1.0\ndescription:"A web app"\nport:3000',
+        after: 'name: web\nversion: 1.0\ndescription: "A web app"\nport: 3000',
+        note: 'Missing colons and missing spaces after colons are detected as syntax errors. The formatter shows the exact position of each issue.'
+      },
+    ].map(({title, before, after, note}) => (
+      <div class="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
+        <div class="px-5 py-3.5 bg-zinc-50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800">
+          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-zinc-200 dark:divide-zinc-800">
+          <div class="p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs font-semibold px-2 py-0.5 rounded bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">BEFORE</span>
+            </div>
+            <pre class="text-xs font-mono text-zinc-500 dark:text-zinc-400 bg-red-50/30 dark:bg-red-950/10 rounded-lg p-3 overflow-x-auto leading-relaxed border border-red-100 dark:border-red-900/20">{before}</pre>
+          </div>
+          <div class="p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">AFTER</span>
+            </div>
+            <pre class="text-xs font-mono text-zinc-700 dark:text-zinc-300 bg-emerald-50/30 dark:bg-emerald-950/10 rounded-lg p-3 overflow-x-auto leading-relaxed border border-emerald-100 dark:border-emerald-900/20">{after}</pre>
+          </div>
+        </div>
+        <div class="px-5 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/30">
+          <p class="text-xs text-zinc-500 dark:text-zinc-400">{note}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

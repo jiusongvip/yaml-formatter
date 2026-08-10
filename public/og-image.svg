@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="60" y="60" width="140" height="140" rx="28" fill="#059669"/>
+  <text x="130" y="155" text-anchor="middle" fill="white" font-family="system-ui,-apple-system,sans-serif" font-size="72" font-weight="800">Y</text>
+  <text x="240" y="165" fill="white" font-family="system-ui,-apple-system,sans-serif" font-size="64" font-weight="700">YAML Formatter</text>
+  <text x="240" y="220" fill="#94a3b8" font-family="system-ui,-apple-system,sans-serif" font-size="28">Free Online YAML Beautifier, Validator &amp; Converter</text>
+  <line x1="240" y1="250" x2="900" y2="250" stroke="#334155" stroke-width="1"/>
+  <text x="60" y="340" fill="#e2e8f0" font-family="monospace" font-size="22" xml:space="preserve"><tspan fill="#38bdf8">apiVersion</tspan>: <tspan fill="#a5f3fc">apps/v1</tspan>
+<tspan fill="#38bdf8">kind</tspan>: <tspan fill="#a5f3fc">Deployment</tspan>
+<tspan fill="#38bdf8">metadata</tspan>:
+  <tspan fill="#38bdf8">name</tspan>: <tspan fill="#a5f3fc">nginx-deployment</tspan>
+<tspan fill="#38bdf8">spec</tspan>:
+  <tspan fill="#38bdf8">replicas</tspan>: <tspan fill="#fbbf24">3</tspan>
+  <tspan fill="#38bdf8">selector</tspan>:
+    <tspan fill="#38bdf8">matchLabels</tspan>:
+      <tspan fill="#38bdf8">app</tspan>: <tspan fill="#a5f3fc">nginx</tspan></text>
+  <text x="60" y="540" fill="#64748b" font-family="system-ui,-apple-system,sans-serif" font-size="20">yaml-formatter.com  ·  Free  ·  No sign-up  ·  Client-side processing</text>
+  <text x="60" y="580" fill="#475569" font-family="system-ui,-apple-system,sans-serif" font-size="16">Format · Validate · Convert to JSON · Syntax highlighting · Dark mode · Open source</text>
+</svg>

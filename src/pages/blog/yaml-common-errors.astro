@@ -1,0 +1,184 @@
+---
+import BlogLayout from '../../layouts/BlogLayout.astro';
+
+const faqs = [
+  { question: 'How do I validate YAML files quickly?', answer: 'The fastest way is to paste your YAML into an online validator like our YAML Formatter. It checks syntax, highlights errors with line numbers, and suggests fixes — all in your browser with no upload. For CI/CD integration, use yamllint (Python) or prettier with the YAML plugin.' },
+  { question: 'Why does my YAML work locally but fail in CI?', answer: 'This usually indicates a parser version mismatch. Your local tool might use YAML 1.2 while CI uses YAML 1.1 (or vice versa). Common symptoms: yes/no being treated as booleans, or octal numbers parsing differently. Always use true/false for booleans and quote ambiguous values.' },
+  { question: 'What\'s the most common YAML error?', answer: 'Tab characters instead of spaces. It\'s invisible in most editors and causes immediate parse failures. The second most common is missing space after colons (key:value instead of key: value). Both are caught instantly by any YAML linter.' },
+  { question: 'Can YAML have duplicate keys?', answer: 'The YAML specification says keys should be unique, but many parsers silently use the last value when duplicates exist. This leads to subtle bugs where configuration appears to be set but is actually overridden. Always validate for duplicate keys before deploying.' },
+  { question: 'How do I debug a large YAML file?', answer: 'Start by validating the entire file with a linter to get the first error location. Fix that error and re-validate — YAML errors cascade, so one fix often resolves multiple reported issues. For Kubernetes manifests, use kubectl apply --dry-run=client -f file.yaml to validate without deploying.' },
+];
+---
+
+<BlogLayout
+  title="7 Common YAML Errors and How to Fix Them"
+  description="The 7 most common YAML syntax errors that cause deployment failures, with practical solutions. Covers tabs, indentation, anchors, and more issues."
+  slug="yaml-common-errors"
+  faqs={faqs}
+>
+  <span slot="breadcrumb">Common YAML Errors</span>
+  <h1 slot="title" class="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">7 Common YAML Errors (and How to Fix Them)</h1>
+
+  <p class="text-lg text-zinc-500 dark:text-zinc-400 lead">YAML's readability comes at a cost: whitespace sensitivity. A single misplaced space or tab can crash your Kubernetes deployment or CI pipeline. Here are the seven most common YAML errors developers face and exactly how to fix them.</p>
+
+  <h2>1. Tabs Instead of Spaces</h2>
+  <p><strong>What happens:</strong> Your YAML parser throws "found character that cannot start any token."</p>
+  <p><strong>Why:</strong> YAML only allows spaces for indentation. Tabs are forbidden. Many editors auto-insert tabs, and it's invisible to the eye.</p>
+  <pre><code># BROKEN (contains tab character)
+deployment:
+&rarr;name: my-app
+&rarr;replicas: 3
+
+# FIXED (spaces only)
+deployment:
+  name: my-app
+  replicas: 3</code></pre>
+  <p><strong>Fix:</strong> Configure your editor to insert spaces when pressing Tab. In VS Code, add <code>"editor.insertSpaces": true</code> and <code>"editor.tabSize": 2</code> to settings. Use our <a href="/#formatter">YAML formatter</a> to auto-detect and fix tab issues.</p>
+
+  <h2>2. Inconsistent Indentation Levels</h2>
+  <p><strong>What happens:</strong> "mapping values are not allowed in this context" or data ends up at the wrong nesting level.</p>
+  <p><strong>Why:</strong> Mixing 2-space and 4-space indentation within the same file confuses the parser about nesting structure.</p>
+  <pre><code># BROKEN (mixed indentation)
+server:
+  host: localhost
+    port: 8080   # 4-space indentation - port is now nested under host instead of server
+
+# FIXED
+server:
+  host: localhost
+  port: 8080</code></pre>
+  <p><strong>Fix:</strong> Pick one indent size (2 spaces is the YAML convention) and use it consistently throughout the file.</p>
+
+  <h2>3. Missing Space After Colon</h2>
+  <p><strong>What happens:</strong> The entire key-value pair is treated as a single string rather than a mapping.</p>
+  <pre><code># BROKEN
+name:John Doe
+age:30
+
+# FIXED
+name: John Doe
+age: 30</code></pre>
+  <p><strong>Fix:</strong> Always put a space after every colon that separates a key from its value. Most modern editors highlight this.</p>
+
+  <h2>4. Accidental Boolean Conversion (Norway Problem)</h2>
+  <p><strong>What happens:</strong> Country codes like <code>NO</code> (Norway), <code>YES</code>, <code>ON</code>, or <code>OFF</code> get converted to booleans in YAML 1.1 parsers.</p>
+  <pre><code># DANGEROUS in YAML 1.1
+country: NO    # Parsed as boolean false instead of string "NO"
+enabled: on    # Parsed as boolean true
+toggle: off    # Parsed as boolean false
+
+# SAFE
+country: "NO"
+enabled: "on"
+toggle: "off"</code></pre>
+  <p><strong>Fix:</strong> Always quote ambiguous strings, especially country codes, version strings, and yes/no values. Use <code>true</code>/<code>false</code> for booleans. Our formatter follows YAML 1.2 which resolves this ambiguity.</p>
+
+  <h2>5. Broken Anchors and Aliases</h2>
+  <p><strong>What happens:</strong> "unknown alias" error or the alias doesn't resolve to the expected value.</p>
+  <pre><code># BROKEN - alias exists but anchor doesn't
+config:
+  <<: *unknown_anchor
+
+# BROKEN - anchor defined but never referenced correctly
+defaults: &defaults
+  timeout: 30
+service:
+  config: *defalts   # Typo in alias name
+
+# FIXED
+defaults: &defaults
+  timeout: 30
+service:
+  <<: *defaults</code></pre>
+
+  <h2>6. Multi-Document Separator Issues</h2>
+  <p><strong>What happens:</strong> Only the first document is processed when you meant to process all of them, or a bare <code>---</code> at the top of the file is treated as a document separator.</p>
+  <pre><code># BROKEN - trailing content after document end marker
+---
+first: doc
+...
+second: doc   # This is invalid; ... ends the stream
+
+# FIXED
+---
+first: doc
+---
+second: doc</code></pre>
+
+  <h2>7. Unquoted Special Characters in Strings</h2>
+  <p><strong>What happens:</strong> Strings containing <code>&#123;&#125;</code>, <code>[]</code>, <code>,</code>, <code>&amp;</code>, <code>*</code>, <code>!</code>, <code>|</code>, <code>&gt;</code>, <code>%</code>, <code>@</code>, or backticks get misinterpreted.</p>
+  <pre><code># BROKEN
+message: Hello &#123;name&#125;!     # {} triggers flow mapping
+path: C:\Users\name        # \U is a unicode escape
+expression: a || b          # || is treated as a special token
+
+# FIXED
+message: "Hello &#123;name&#125;!"
+path: "C:\\Users\\name"
+expression: "a || b"</code></pre>
+
+  <h2>Real-World Impact: YAML Errors in Production</h2>
+  <p>YAML syntax errors aren't just academic — they cause real outages. Here are scenarios we've seen repeatedly:</p>
+  <ul>
+    <li><strong>Kubernetes Deployment Failure:</strong> A team deploys a new service but the pod stays in <code>CrashLoopBackOff</code>. The cause? A tab character in the ConfigMap YAML that was invisible in their editor. The fix: configure all team editors with <code>"editor.insertSpaces": true</code>.</li>
+    <li><strong>GitHub Actions Silent Failure:</strong> A workflow step runs but produces unexpected results. The <code>if</code> condition with <code>env.DEPLOY == 'yes'</code> always evaluates to true because YAML 1.1 parsed <code>yes</code> as boolean <code>true</code>. The fix: always quote string values that could be misinterpreted.</li>
+    <li><strong>Docker Compose Port Mismatch:</strong> A developer adds a new service but indents the <code>ports</code> key under <code>environment</code> instead of the service root. Docker Compose silently ignores the misplaced key. The service starts without exposed ports.</li>
+    <li><strong>Helm Chart Merge Conflict:</strong> Two developers modify the same values file. After resolving git conflicts, inconsistent indentation causes the parser to read keys at the wrong nesting level. The application starts with default values instead of overrides.</li>
+  </ul>
+
+  <h2>YAML Error Prevention Checklist</h2>
+  <p>Before committing any YAML file to production, run through this checklist:</p>
+  <ul>
+    <li><strong>Editor configured:</strong> Spaces only (no tabs), 2-space indent, show invisible characters</li>
+    <li><strong>Consistent indentation:</strong> Every level uses the same number of spaces throughout the file</li>
+    <li><strong>Colons have trailing spaces:</strong> Every <code>key: value</code> pair has a space after the colon</li>
+    <li><strong>Ambiguous values quoted:</strong> Country codes, version strings, yes/no values all wrapped in quotes</li>
+    <li><strong>Anchors resolve correctly:</strong> Every <code>*alias</code> has a matching <code>&amp;anchor</code> defined earlier in the document</li>
+    <li><strong>Document separators clean:</strong> <code>---</code> on its own line, no content after <code>...</code></li>
+    <li><strong>Special characters escaped:</strong> Strings with <code>{}</code>, <code>[]</code>, or backslashes are double-quoted</li>
+    <li><strong>Validated with a linter:</strong> Run through our <a href="/#formatter">YAML formatter</a> or <code>yamllint</code> before committing</li>
+  </ul>
+  <p>For a comprehensive YAML syntax reference, see our <a href="/blog/yaml-syntax-guide">YAML Syntax Guide</a>.</p>
+
+  <h2>YAML Linting and Validation Tools</h2>
+  <p>Preventing YAML errors starts with proper tooling. Here are the most effective linting and validation tools used in production environments:</p>
+  <ul>
+    <li><strong>yamllint:</strong> The standard Python-based YAML linter. Checks syntax, indentation, line length, and trailing spaces. Configurable via <code>.yamllint</code> file. Integrates with pre-commit hooks and CI pipelines.</li>
+    <li><strong>Prettier:</strong> While primarily a code formatter, Prettier's YAML plugin (<code>prettier-plugin-yaml</code>) enforces consistent formatting across your project.</li>
+    <li><strong>VS Code YAML Extension:</strong> Red Hat's YAML extension provides real-time validation, auto-completion, and schema support directly in your editor.</li>
+    <li><strong>kubeval / kubeconform:</strong> Kubernetes-specific validators that check your manifests against the API schema. They catch structural errors that a generic YAML linter would miss.</li>
+    <li><strong>Online validators:</strong> Our <a href="/#formatter">YAML Formatter</a> provides instant browser-based validation with precise error locations — no installation required.</li>
+  </ul>
+  <p>The most effective strategy is layered: use editor extensions for instant feedback, yamllint in pre-commit hooks for code review, and a validator in CI/CD as a final safety net. This three-layer approach catches virtually all YAML errors before they reach production.</p>
+
+  <h2>YAML Key Naming Conventions</h2>
+  <p>While YAML allows almost any string as a key, following naming conventions prevents subtle bugs and improves readability:</p>
+  <ul>
+    <li><strong>Use lowercase with underscores:</strong> <code>database_timeout</code> is clearer than <code>databaseTimeout</code> or <code>DatabaseTimeout</code>. Most YAML style guides recommend snake_case.</li>
+    <li><strong>Avoid special characters in keys:</strong> Keys containing colons, brackets, or quotes require escaping and are easy to mistype. Prefer simple alphanumeric keys with underscores.</li>
+    <li><strong>Don't use numeric keys unless necessary:</strong> Numeric-looking keys (<code>123</code>, <code>1.0</code>) may be parsed as numbers instead of strings. If you must use them, quote them: <code>"123"</code>.</li>
+    <li><strong>Be consistent within a file:</strong> Don't mix <code>camelCase</code> and <code>snake_case</code> in the same configuration. Consistency reduces cognitive load and prevents duplicate-key bugs.</li>
+    <li><strong>Use descriptive names:</strong> <code>max_connection_retries</code> is self-documenting. <code>mcr</code> is not. Configuration files are often read by people who didn't write them.</li>
+  </ul>
+  <p>These conventions aren't enforced by the YAML specification, but they're widely followed in the Kubernetes, Docker, and CI/CD ecosystems. Following them makes your configuration files easier to review, debug, and maintain.</p>
+
+  <h2>Frequently Asked Questions</h2>
+
+  <h3>How do I validate YAML files quickly?</h3>
+  <p>The fastest way is to paste your YAML into an online validator like our <a href="/#formatter">YAML Formatter</a>. It checks syntax, highlights errors with line numbers, and suggests fixes — all in your browser with no upload. For CI/CD integration, use <code>yamllint</code> (Python) or <code>prettier</code> with the YAML plugin.</p>
+
+  <h3>Why does my YAML work locally but fail in CI?</h3>
+  <p>This usually indicates a parser version mismatch. Your local tool might use YAML 1.2 while CI uses YAML 1.1 (or vice versa). Common symptoms: <code>yes/no</code> being treated as booleans, or octal numbers parsing differently. Always use <code>true/false</code> for booleans and quote ambiguous values.</p>
+
+  <h3>What's the most common YAML error?</h3>
+  <p>Tab characters instead of spaces. It's invisible in most editors and causes immediate parse failures. The second most common is missing space after colons (<code>key:value</code> instead of <code>key: value</code>). Both are caught instantly by any YAML linter.</p>
+
+  <h3>Can YAML have duplicate keys?</h3>
+  <p>The YAML specification says keys should be unique, but many parsers silently use the last value when duplicates exist. This leads to subtle bugs where configuration appears to be set but is actually overridden. Always validate for duplicate keys before deploying.</p>
+
+  <h3>How do I debug a large YAML file?</h3>
+  <p>Start by validating the entire file with a linter to get the first error location. Fix that error and re-validate — YAML errors cascade, so one fix often resolves multiple reported issues. For Kubernetes manifests, use <code>kubectl apply --dry-run=client -f file.yaml</code> to validate without deploying.</p>
+
+  <h2>The Fastest Way to Find and Fix YAML Errors</h2>
+  <p>Stop debugging YAML manually. Use our <a href="/#formatter">YAML validator and formatter</a> to catch all seven of these errors instantly with precise line and column numbers. Paste your YAML, see the error highlighted, fix it, and copy the clean output — all in your browser, zero server upload. For more on YAML syntax, check out our <a href="/blog/yaml-vs-json-vs-toml">YAML vs JSON vs TOML comparison</a>.</p>
+</BlogLayout>
