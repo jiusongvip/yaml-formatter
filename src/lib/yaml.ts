@@ -1,6 +1,5 @@
 // YAML processing - all pure JS, runs in browser
 import { parse, parseDocument, stringify } from "yaml";
-import Ajv from "ajv";
 
 export interface FormatOptions {
   indent?: number;
@@ -182,11 +181,13 @@ export interface SchemaValidationResult {
   errors: Array<{ path: string; message: string; keyword: string }>;
 }
 
-// Validate YAML against a JSON Schema
-export function validateSchema(yamlInput: string, schemaJson: string): SchemaValidationResult {
+// Validate YAML against a JSON Schema. Ajv is loaded on demand so the main
+// tool bundle never pays for it — only the Schema tab triggers this.
+export async function validateSchema(yamlInput: string, schemaJson: string): Promise<SchemaValidationResult> {
   try {
     const parsed = parse(yamlInput);
     const schema = JSON.parse(schemaJson);
+    const { default: Ajv } = await import("ajv");
     const ajv = new Ajv({ allErrors: true, strict: false });
     const validate = ajv.compile(schema);
     const valid = validate(parsed);

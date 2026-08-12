@@ -1,87 +1,704 @@
 @import "tailwindcss";
 
-/* Smooth theme transition */
+/* B version is always light (like tinypng). Re-map the `dark` variant to a
+   class that never exists so OS dark mode cannot flip sections. */
+@custom-variant dark (&:where(.never-dark, .never-dark *));
+
+/* ============================================================================
+   Neutral minimal design system · B version
+   ----------------------------------------------------------------------------
+   ① Design System (measurable)
+     - Palette: neutral surfaces (white / soft gray / ink) + ONE accent blue
+       Functional red kept for errors / destructive / diff-removed ONLY.
+     - Type: large display headline + quiet body. Sans for prose, mono ONLY
+       inside tool editors / code / input-output.
+     - Spacing: generous breathing whitespace (not scroll distance).
+     - No glow, no decorative glyphs, no animated borders. Quiet borders only.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   Design tokens
+   ------------------------------------------------------------------------ */
+:root {
+  /* accent — the single brand hue (Tailwind `blue` default = #2563eb too) */
+  --accent: #2563eb;
+  --accent-strong: #1d4ed8;
+  --accent-soft: #eff6ff;
+
+  /* neutral ramp */
+  --ink: #18181b;
+  --ink-2: #52525b;
+  --ink-3: #71717a;
+  --ink-4: #a1a1aa;
+  --line: #e4e4e7;
+  --line-soft: #f0f0f1;
+  --bg: #ffffff;
+  --bg-soft: #fafafa;
+  --bg-tool: #fafafa;
+
+  /* status — functional red only (errors, invalid, removed) */
+  --danger: #dc2626;
+  --danger-bg: #fef2f2;
+
+  /* Type */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono",
+    "Fira Code", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* ---------------------------------------------------------------------------
+   Single-accent color mapping — collapse every decorative hue into the one
+   accent blue so existing emerald/cyan/amber/purple/... utility vocabulary
+   renders neutral-blue everywhere. `red` stays functional (errors).
+   ------------------------------------------------------------------------ */
+@theme {
+  --color-emerald-50: #eff6ff;
+  --color-emerald-100: #dbeafe;
+  --color-emerald-200: #bfdbfe;
+  --color-emerald-300: #93c5fd;
+  --color-emerald-400: #60a5fa;
+  --color-emerald-500: #3b82f6;
+  --color-emerald-600: #2563eb;
+  --color-emerald-700: #1d4ed8;
+  --color-emerald-800: #1e40af;
+  --color-emerald-900: #1e3a8a;
+  --color-emerald-950: #172554;
+
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bfdbfe;
+  --color-blue-300: #93c5fd;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+  --color-blue-800: #1e40af;
+  --color-blue-900: #1e3a8a;
+  --color-blue-950: #172554;
+
+  --color-cyan-50: #eff6ff;
+  --color-cyan-100: #dbeafe;
+  --color-cyan-200: #bfdbfe;
+  --color-cyan-300: #93c5fd;
+  --color-cyan-400: #60a5fa;
+  --color-cyan-500: #3b82f6;
+  --color-cyan-600: #2563eb;
+  --color-cyan-700: #1d4ed8;
+  --color-cyan-800: #1e40af;
+  --color-cyan-900: #1e3a8a;
+  --color-cyan-950: #172554;
+
+  --color-teal-50: #eff6ff;
+  --color-teal-100: #dbeafe;
+  --color-teal-200: #bfdbfe;
+  --color-teal-300: #93c5fd;
+  --color-teal-400: #60a5fa;
+  --color-teal-500: #3b82f6;
+  --color-teal-600: #2563eb;
+  --color-teal-700: #1d4ed8;
+  --color-teal-800: #1e40af;
+  --color-teal-900: #1e3a8a;
+  --color-teal-950: #172554;
+
+  --color-violet-50: #eff6ff;
+  --color-violet-100: #dbeafe;
+  --color-violet-200: #bfdbfe;
+  --color-violet-300: #93c5fd;
+  --color-violet-400: #60a5fa;
+  --color-violet-500: #3b82f6;
+  --color-violet-600: #2563eb;
+  --color-violet-700: #1d4ed8;
+  --color-violet-800: #1e40af;
+  --color-violet-900: #1e3a8a;
+  --color-violet-950: #172554;
+
+  --color-indigo-50: #eff6ff;
+  --color-indigo-100: #dbeafe;
+  --color-indigo-200: #bfdbfe;
+  --color-indigo-300: #93c5fd;
+  --color-indigo-400: #60a5fa;
+  --color-indigo-500: #3b82f6;
+  --color-indigo-600: #2563eb;
+  --color-indigo-700: #1d4ed8;
+  --color-indigo-800: #1e40af;
+  --color-indigo-900: #1e3a8a;
+  --color-indigo-950: #172554;
+
+  --color-purple-50: #eff6ff;
+  --color-purple-100: #dbeafe;
+  --color-purple-200: #bfdbfe;
+  --color-purple-300: #93c5fd;
+  --color-purple-400: #60a5fa;
+  --color-purple-500: #3b82f6;
+  --color-purple-600: #2563eb;
+  --color-purple-700: #1d4ed8;
+  --color-purple-800: #1e40af;
+  --color-purple-900: #1e3a8a;
+  --color-purple-950: #172554;
+
+  --color-fuchsia-50: #eff6ff;
+  --color-fuchsia-100: #dbeafe;
+  --color-fuchsia-200: #bfdbfe;
+  --color-fuchsia-300: #93c5fd;
+  --color-fuchsia-400: #60a5fa;
+  --color-fuchsia-500: #3b82f6;
+  --color-fuchsia-600: #2563eb;
+  --color-fuchsia-700: #1d4ed8;
+  --color-fuchsia-800: #1e40af;
+  --color-fuchsia-900: #1e3a8a;
+  --color-fuchsia-950: #172554;
+
+  --color-pink-50: #eff6ff;
+  --color-pink-100: #dbeafe;
+  --color-pink-200: #bfdbfe;
+  --color-pink-300: #93c5fd;
+  --color-pink-400: #60a5fa;
+  --color-pink-500: #3b82f6;
+  --color-pink-600: #2563eb;
+  --color-pink-700: #1d4ed8;
+  --color-pink-800: #1e40af;
+  --color-pink-900: #1e3a8a;
+  --color-pink-950: #172554;
+
+  --color-rose-50: #eff6ff;
+  --color-rose-100: #dbeafe;
+  --color-rose-200: #bfdbfe;
+  --color-rose-300: #93c5fd;
+  --color-rose-400: #60a5fa;
+  --color-rose-500: #3b82f6;
+  --color-rose-600: #2563eb;
+  --color-rose-700: #1d4ed8;
+  --color-rose-800: #1e40af;
+  --color-rose-900: #1e3a8a;
+  --color-rose-950: #172554;
+
+  --color-amber-50: #eff6ff;
+  --color-amber-100: #dbeafe;
+  --color-amber-200: #bfdbfe;
+  --color-amber-300: #93c5fd;
+  --color-amber-400: #60a5fa;
+  --color-amber-500: #3b82f6;
+  --color-amber-600: #2563eb;
+  --color-amber-700: #1d4ed8;
+  --color-amber-800: #1e40af;
+  --color-amber-900: #1e3a8a;
+  --color-amber-950: #172554;
+
+  --color-orange-50: #eff6ff;
+  --color-orange-100: #dbeafe;
+  --color-orange-200: #bfdbfe;
+  --color-orange-300: #93c5fd;
+  --color-orange-400: #60a5fa;
+  --color-orange-500: #3b82f6;
+  --color-orange-600: #2563eb;
+  --color-orange-700: #1d4ed8;
+  --color-orange-800: #1e40af;
+  --color-orange-900: #1e3a8a;
+  --color-orange-950: #172554;
+
+  --color-lime-50: #eff6ff;
+  --color-lime-100: #dbeafe;
+  --color-lime-200: #bfdbfe;
+  --color-lime-300: #93c5fd;
+  --color-lime-400: #60a5fa;
+  --color-lime-500: #3b82f6;
+  --color-lime-600: #2563eb;
+  --color-lime-700: #1d4ed8;
+  --color-lime-800: #1e40af;
+  --color-lime-900: #1e3a8a;
+  --color-lime-950: #172554;
+
+  --color-green-50: #eff6ff;
+  --color-green-100: #dbeafe;
+  --color-green-200: #bfdbfe;
+  --color-green-300: #93c5fd;
+  --color-green-400: #60a5fa;
+  --color-green-500: #3b82f6;
+  --color-green-600: #2563eb;
+  --color-green-700: #1d4ed8;
+  --color-green-800: #1e40af;
+  --color-green-900: #1e3a8a;
+  --color-green-950: #172554;
+
+  --color-yellow-50: #eff6ff;
+  --color-yellow-100: #dbeafe;
+  --color-yellow-200: #bfdbfe;
+  --color-yellow-300: #93c5fd;
+  --color-yellow-400: #60a5fa;
+  --color-yellow-500: #3b82f6;
+  --color-yellow-600: #2563eb;
+  --color-yellow-700: #1d4ed8;
+  --color-yellow-800: #1e40af;
+  --color-yellow-900: #1e3a8a;
+  --color-yellow-950: #172554;
+
+  /* functional red — errors, invalid, destructive, diff-removed ONLY */
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-200: #fecaca;
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+  --color-red-800: #991b1b;
+  --color-red-900: #7f1d1d;
+  --color-red-950: #450a0a;
+}
+
+/* ---------------------------------------------------------------------------
+   Base — quiet neutral pages
+   ------------------------------------------------------------------------ */
 html {
-  transition: color 0.3s ease, background-color 0.3s ease;
-}
-html.dark {
-  color-scheme: dark;
+  color-scheme: light;
+  scrollbar-color: var(--line) var(--bg);
 }
 
-/* Section alternation for visual rhythm */
-section:nth-of-type(even) {
-  background: linear-gradient(to bottom, transparent, rgb(249 250 251 / 0.5), transparent);
-}
-.dark section:nth-of-type(even) {
-  background: linear-gradient(to bottom, transparent, rgb(9 9 11 / 0.5), transparent);
-}
-
-/* Scroll-to-top button */
-#scroll-top {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  transform: translateY(12px);
-}
-#scroll-top.visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1;
 }
 
-/* YAML code block syntax highlighting */
-pre code,
-pre {
-  tab-size: 2;
-}
-/* Comment lines */
-pre .cmt,
-pre:not([class]) span.cmt {
-  color: #6b7280;
-}
-.dark pre .cmt,
-.dark pre:not([class]) span.cmt {
-  color: #6b7280;
+::selection {
+  background: var(--accent);
+  color: #fff;
 }
 
-/* FAQ accordion smooth animation */
-.faq-answer {
-  animation: faqIn 0.2s ease;
-}
-@keyframes faqIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
+/* no glow — kill every box/text shadow to keep the page perfectly flat */
+*,
+*::before,
+*::after {
+  box-shadow: none !important;
+  text-shadow: none !important;
 }
 
-/* CodeMirror overrides for better dark mode */
-.dark .cm-editor {
+/* mono ONLY for tool surfaces, editors, and code — never for prose */
+pre,
+code,
+kbd,
+samp,
+textarea,
+input,
+select,
+.font-mono,
+.cm-editor,
+.cm-editor .cm-content,
+.cm-editor .cm-gutters,
+.cm-editor .cm-activeLine,
+.cm-editor .cm-error-line {
+  font-family: var(--font-mono) !important;
+}
+
+/* anchors inherit quietly */
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-sans);
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+/* ---------------------------------------------------------------------------
+   Typography scale — display really big, body really quiet
+   ------------------------------------------------------------------------ */
+.display {
+  font-size: clamp(30px, 4.8vw, 56px);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.display-lg {
+  font-size: clamp(56px, 8vw, 112px);
+  line-height: 0.98;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+.lead {
+  font-size: clamp(16px, 1.5vw, 18px);
+  line-height: 1.65;
+  color: var(--ink-2);
+  font-weight: 400;
+}
+.h-section {
+  font-size: clamp(26px, 3vw, 40px);
+  line-height: 1.12;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+.h-sub {
+  font-size: clamp(18px, 1.6vw, 22px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.mute {
+  color: var(--ink-2);
+}
+.faint {
+  color: var(--ink-4);
+}
+
+/* ---------------------------------------------------------------------------
+   Layout — breathing room
+   ------------------------------------------------------------------------ */
+.container-tool {
+  margin-inline: auto;
+  max-width: 1200px;
+  padding-inline: clamp(20px, 4vw, 40px);
+}
+.container-narrow {
+  margin-inline: auto;
+  max-width: 860px;
+  padding-inline: clamp(20px, 4vw, 32px);
+}
+.section {
+  padding-block: clamp(72px, 11vh, 120px);
+}
+.band-soft {
+  background: var(--bg-soft);
+}
+
+/* ---------------------------------------------------------------------------
+   Tool surfaces
+   ------------------------------------------------------------------------ */
+.tool-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.tool-bar {
+  background: var(--bg-soft);
+  border-bottom: 1px solid var(--line);
+}
+.tool-frame {
+  background: var(--bg-tool);
+  border: 1px solid var(--line-soft);
+}
+
+/* simple solid accent button — no glow, no border effects */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid var(--accent);
+}
+.btn-primary:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  text-decoration: none;
+}
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid var(--line);
+}
+.btn-secondary:hover {
+  background: var(--bg-soft);
+  border-color: var(--ink-4);
+  text-decoration: none;
+}
+
+/* quiet segmented tabs for tool modes */
+.tabs {
+  display: inline-flex;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 3px;
+}
+.tab {
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+  border-radius: 9px;
+  cursor: pointer;
+  border: none;
   background: transparent;
+  transition: none;
 }
-.dark .cm-editor .cm-content {
-  caret-color: #e4e4e7;
+.tab:hover {
+  color: var(--ink);
 }
-.dark .cm-editor .cm-activeLine {
-  background: rgba(255,255,255,0.04) !important;
+.tab[aria-selected="true"],
+.tab.active {
+  background: var(--bg);
+  color: var(--accent);
+  border: 1px solid var(--line);
+  padding: 7px 15px;
 }
 
-/* Better scrollbar */
+/* tool textarea */
+.tool-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.65;
+  padding: 14px 16px;
+  outline: none;
+  resize: vertical;
+}
+.tool-input:focus {
+  border-color: var(--accent);
+}
+.tool-input::placeholder {
+  color: var(--ink-4);
+}
+
+/* status bar under tools */
+.statusline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--line);
+  background: var(--bg-soft);
+  color: var(--ink-3);
+  font-size: 12px;
+}
+.statusline b,
+.statusline .hit {
+  color: var(--accent);
+  font-weight: 600;
+}
+.statusline .sep {
+  color: var(--line);
+}
+
+/* divider — plain quiet rule */
+.divider {
+  height: 1px;
+  border: 0;
+  background: var(--line);
+}
+
+/* ---------------------------------------------------------------------------
+   Header
+   ------------------------------------------------------------------------ */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.site-header a {
+  color: inherit;
+}
+.nav-link {
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 500;
+}
+.nav-link:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+.nav-link.active {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------------------
+   Footer
+   ------------------------------------------------------------------------ */
+.site-footer {
+  border-top: 1px solid var(--line);
+  background: var(--bg-soft);
+  color: var(--ink-3);
+  font-size: 14px;
+}
+.site-footer a {
+  color: var(--ink-2);
+}
+.site-footer a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Article prose (blogs)
+   ------------------------------------------------------------------------ */
+.article h1 {
+  font-size: clamp(32px, 4.6vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+.article h2 {
+  font-size: clamp(24px, 2.8vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 2.8rem;
+}
+.article h3 {
+  font-size: clamp(19px, 2vw, 22px);
+  font-weight: 600;
+  margin-top: 2.2rem;
+}
+.article p {
+  font-size: 16.5px;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+.article ul,
+.article ol {
+  color: var(--ink-2);
+  line-height: 1.75;
+}
+.article pre {
+  background: #0b0e14;
+  color: #d6e2f0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+.article blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 18px;
+  color: var(--ink-2);
+}
+.article a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------------------
+   FAQ accordion
+   ------------------------------------------------------------------------ */
+.faq-answer {
+  animation: bFadeIn 0.16s ease;
+}
+@keyframes bFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   CodeMirror — quiet light-theme overrides
+   ------------------------------------------------------------------------ */
+.cm-editor {
+  background: var(--bg) !important;
+}
+.cm-editor .cm-content {
+  caret-color: var(--accent);
+}
+.cm-editor .cm-activeLine {
+  background: var(--accent-soft) !important;
+}
+.cm-editor .cm-gutters {
+  background: var(--bg-soft) !important;
+  color: var(--ink-4) !important;
+  border-right: 1px solid var(--line) !important;
+}
+.cm-editor .cm-activeLineGutter {
+  background: transparent !important;
+  color: var(--accent) !important;
+}
+.cm-editor .cm-error-line {
+  background: var(--danger-bg) !important;
+}
+.cm-editor .cm-cursor {
+  border-left-color: var(--accent) !important;
+}
+
+/* YAML block comment tint in editor */
+.cm-editor .cmt {
+  color: #a1a1aa !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Tables — quiet neutral
+   ------------------------------------------------------------------------ */
+table {
+  border-color: var(--line);
+}
+table th {
+  background: var(--bg-soft);
+  border-color: var(--line);
+}
+table td {
+  border-color: var(--line-soft);
+}
+table tr:hover td {
+  background: var(--bg-soft);
+}
+
+/* ---------------------------------------------------------------------------
+   Scrollbar
+   ------------------------------------------------------------------------ */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d8;
-  border-radius: 4px;
-}
-.dark ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
+  background: var(--ink-4);
+  border: 2px solid var(--bg);
+  border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1aa;
-}
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #52525b;
+  background: var(--ink-3);
 }

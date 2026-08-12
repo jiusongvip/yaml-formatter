@@ -1,20 +1,36 @@
 ---
+const year = new Date().getFullYear();
 ---
 
-<footer class="border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/50">
-  <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2 text-sm text-zinc-400 dark:text-zinc-500">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Built for developers. Open source. No ads, no tracking.
+<footer class="site-footer">
+  <div class="container-tool py-12">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+      <div>
+        <p class="font-semibold text-zinc-900 text-[15px]">YAML Formatter</p>
+        <p class="mt-1.5 text-sm max-w-sm">
+          Format, validate and convert YAML and JSON. Runs entirely in your browser —
+          nothing is ever uploaded.
+        </p>
       </div>
-      <div class="flex items-center gap-6 text-sm">
-        <a href="/#formatter" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Formatter</a>
-        <a href="/yaml-to-json" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">YAML to JSON</a>
-        <a href="/blog/yaml-syntax-guide" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Blog</a>
-        <a href="/privacy" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Privacy</a>
+      <div class="flex flex-col sm:flex-row gap-6 sm:items-center">
+        <div class="flex flex-col gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Tools</span>
+          <a href="/" class="text-sm">Formatter</a>
+          <a href="/yaml-to-json" class="text-sm">YAML to JSON</a>
+          <a href="/json-to-yaml" class="text-sm">JSON to YAML</a>
+          <a href="/case-converter" class="text-sm">Case Converter</a>
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Site</span>
+          <a href="/blog" class="text-sm">Blog</a>
+          <a href="/privacy" class="text-sm">Privacy</a>
+          <a href="https://github.com/jiusongvip/yaml-formatter" target="_blank" rel="noopener" class="text-sm">GitHub</a>
+        </div>
       </div>
     </div>
-    <p class="mt-6 text-center text-xs text-zinc-400 dark:text-zinc-500">&copy; {new Date().getFullYear()} YAML Formatter. All processing is client-side.</p>
+    <div class="mt-10 pt-6 border-t border-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
+      <p>© {year} YAML Formatter</p>
+      <p>Free to use · Open source · No tracking</p>
+    </div>
   </div>
 </footer>

@@ -1,10 +1,10 @@
 import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
+import preact from '@astrojs/preact';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  integrations: [react(), sitemap()],
+  integrations: [preact({ compat: true }), sitemap()],
   output: 'static',
   site: 'https://yaml-formatter.com',
   trailingSlash: 'never',

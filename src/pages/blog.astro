@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const posts = [
+  {
+    slug: 'yaml-syntax-guide',
+    title: 'YAML Syntax Guide: A Complete Reference',
+    description: 'Learn YAML syntax from the ground up. Covering scalars, mappings, sequences, anchors, aliases, and best practices for clean YAML config files.',
+    date: '2025-01-15',
+  },
+  {
+    slug: 'yaml-common-errors',
+    title: '7 Common YAML Errors and How to Fix Them',
+    description: 'The 7 most common YAML syntax errors that cause deployment failures, with practical solutions. Covers tabs, indentation, anchors, and more.',
+    date: '2025-02-02',
+  },
+  {
+    slug: 'yaml-vs-json-vs-toml',
+    title: 'YAML vs JSON vs TOML: Which Format Should You Use?',
+    description: 'YAML vs JSON vs TOML compared for configuration files. Learn the strengths, weaknesses, and ideal use cases of each format.',
+    date: '2025-03-10',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: 'YAML Formatter Blog',
+  url: 'https://yaml-formatter.com/blog',
+  description: 'Guides and references for working with YAML configuration files.',
+  blogPost: posts.map(p => ({
+    '@type': 'BlogPosting',
+    headline: p.title,
+    description: p.description,
+    url: `https://yaml-formatter.com/blog/${p.slug}`,
+    datePublished: p.date,
+  })),
+};
+---
+
+<BaseLayout
+  title="Blog - YAML Guides & References | YAML Formatter"
+  description="Guides on YAML syntax, common errors, and format comparisons. Learn to write clean, reliable YAML configuration files."
+>
+  <Header />
+  <main>
+    <section class="container-tool pt-16 md:pt-24 pb-6">
+      <p class="eyebrow">Blog</p>
+      <h1 class="display mt-5">YAML guides &amp; references</h1>
+      <p class="lead mt-7 max-w-2xl">
+        Practical writing on YAML — the configuration language behind Kubernetes,
+        Docker, CI/CD, and infrastructure-as-code.
+      </p>
+    </section>
+
+    <section class="container-tool section pt-10">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {posts.map(p => (
+          <a href={`/blog/${p.slug}`} class="tool-card no-underline block p-6 hover:bg-zinc-50">
+            <time class="text-xs text-zinc-400 font-medium">{p.date}</time>
+            <h2 class="h-sub mt-3">{p.title}</h2>
+            <p class="mt-2 text-sm text-zinc-500 leading-relaxed">{p.description}</p>
+            <span class="inline-flex items-center gap-1.5 mt-4 text-sm font-medium text-blue-600">
+              Read
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
+  <Footer />
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</BaseLayout>

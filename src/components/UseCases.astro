@@ -1,24 +1,24 @@
 ---
 ---
-
-<section id="use-cases" class="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-  <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-    YAML Use Cases
-  </h2>
-  <p class="mt-4 text-zinc-500 dark:text-zinc-400">YAML is the backbone of modern infrastructure-as-code. Here are the most common scenarios where our formatter saves you time.</p>
-  <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-    {[
-      { title: 'Kubernetes Manifests', desc: 'Kubernetes deployments, services, configmaps, and ingress controllers are all defined in YAML. A single misplaced space can prevent a pod from scheduling. Our formatter validates K8s YAML structure and ensures consistent indentation across all your manifests.', kw: 'kubernetes yaml formatter' },
-      { title: 'Docker Compose', desc: 'Multi-container Docker applications use docker-compose.yml to define services, networks, and volumes. Formatting ensures service dependencies, port mappings, and environment variables are correctly nested and readable.', kw: 'docker compose yaml' },
-      { title: 'Ansible Playbooks', desc: 'Ansible automation relies on YAML playbooks to define tasks, handlers, and roles. Clean formatting makes complex playbooks maintainable across teams and prevents syntax errors during execution.', kw: 'ansible yaml formatter' },
-      { title: 'CI/CD Pipelines', desc: 'GitHub Actions, GitLab CI, CircleCI, and Bitbucket Pipelines all use YAML for workflow definitions. Our formatter handles multi-document YAML files and complex job matrices with ease.', kw: 'github actions yaml' },
-      { title: 'OpenAPI / Swagger', desc: 'REST API specifications in OpenAPI 3.0 use YAML to define endpoints, parameters, and schemas. Consistent formatting makes API documentation readable and diff-friendly.', kw: 'openapi yaml formatter' },
-      { title: 'Helm Charts', desc: 'Helm, the Kubernetes package manager, uses YAML for chart values and templates. Formatted values.yaml files are easier to audit, override, and maintain across environments.', kw: 'helm yaml formatter' },
-    ].map(({title, desc}) => (
-      <div class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900">
-        <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
-        <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">{desc}</p>
-      </div>
-    ))}
+<section id="use-cases" class="section">
+  <div class="container-tool">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <p class="eyebrow">Use cases</p>
+      <h2 class="h-section mt-3">YAML everywhere you work</h2>
+      <p class="lead mt-4">YAML is the backbone of modern infrastructure-as-code. These are the files our formatter cleans up most.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {[
+        { title: 'Kubernetes manifests', desc: 'Deployments, services, configmaps — all defined in YAML. A misplaced space can stop a pod from scheduling. Validate structure and keep indentation consistent.' },
+        { title: 'Docker Compose', desc: 'Multi-container apps rely on docker-compose.yml. Ensure services, networks, and volumes are nested and readable.' },
+        { title: 'CI/CD pipelines', desc: 'GitHub Actions, GitLab CI, and CircleCI use YAML workflows. Handles multi-document files and job matrices with ease.' },
+        { title: 'Ansible playbooks', desc: 'Tasks, handlers, and roles in YAML. Clean formatting keeps complex playbooks maintainable across a team.' },
+      ].map(({ title, desc }) => (
+        <div class="p-6 rounded-2xl border border-zinc-200 bg-white">
+          <h3 class="h-sub">{title}</h3>
+          <p class="mt-2 text-sm text-zinc-500 leading-relaxed">{desc}</p>
+        </div>
+      ))}
+    </div>
   </div>
 </section>

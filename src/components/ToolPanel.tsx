@@ -325,6 +325,8 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
   const [urlLoading, setUrlLoading] = useState(false);
   const [urlLoadError, setUrlLoadError] = useState<string | null>(null);
   const [schemaInput, setSchemaInput] = useState("");
+  const [schemaResult, setSchemaResult] = useState<SchemaValidationResult | null>(null);
+  const [schemaValidating, setSchemaValidating] = useState(false);
   const [history, setHistory] = useState<Array<{ input: string; output: string; tab: TabType; ts: number }>>([]);
 
   const inputRef = useRef<HTMLDivElement>(null);
@@ -341,6 +343,8 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
         setDiffChanges([]);
         return;
       }
+      // Schema validation is handled by its own async effect (lazy-loads Ajv).
+      if (tab === "schema") return;
       const t0 = performance.now();
       if (tab === "json-to-yaml") {
         const r = jsonToYAML(value);
@@ -453,6 +457,28 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
   useEffect(() => {
     if (autoFormat) processYAML(input);
   }, [autoFormat]);
+
+  // Schema validation — lazy: ajv is only fetched from the network when the
+  // Schema tab is opened and there is something to validate.
+  useEffect(() => {
+    if (tab !== "schema") return;
+    let cancelled = false;
+    if (!input.trim() || !schemaInput.trim()) {
+      setSchemaResult(null);
+      setSchemaValidating(false);
+      return;
+    }
+    setSchemaValidating(true);
+    validateSchema(input, schemaInput).then((r) => {
+      if (!cancelled) {
+        setSchemaResult(r);
+        setSchemaValidating(false);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [tab, input, schemaInput]);
   // Save to history when output changes
   useEffect(() => {
     if (output && input.trim() && !error) {
@@ -597,22 +623,22 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
   const outputLines = output ? output.split("\n").length : 0;
 
   return (
-    <section id="formatter" className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-6">
-      <div className="border border-zinc-200 dark:border-zinc-700 rounded-xl overflow-hidden bg-white dark:bg-zinc-900 shadow-sm">
+    <section id="formatter" className="container-tool pb-6">
+      <div className="border border-zinc-200 rounded-xl overflow-hidden bg-white shadow-sm">
         {/* Toolbar */}
-        <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50/80 dark:bg-zinc-950/80">
+        <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-zinc-200 bg-zinc-50/80">
           {/* Tab buttons */}
-          <div className="flex rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden bg-white dark:bg-zinc-900">
-            <button onClick={() => handleTabChange("format")} className={`px-3.5 py-1.5 text-xs font-semibold transition-colors border-r border-zinc-200 dark:border-zinc-700 ${tab === "format" ? "bg-emerald-600 text-white" : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}>
+          <div className="flex rounded-lg border border-zinc-200 overflow-hidden bg-white">
+            <button onClick={() => handleTabChange("format")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors border-r border-zinc-200 ${tab === "format" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
               Format
             </button>
-            <button onClick={() => handleTabChange("to-json")} className={`px-3.5 py-1.5 text-xs font-semibold transition-colors border-r border-zinc-200 dark:border-zinc-700 ${tab === "to-json" ? "bg-emerald-600 text-white" : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}>
+            <button onClick={() => handleTabChange("to-json")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors border-r border-zinc-200 ${tab === "to-json" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
               YAML to JSON
             </button>
-            <button onClick={() => handleTabChange("json-to-yaml")} className={`px-3.5 py-1.5 text-xs font-semibold transition-colors border-r border-zinc-200 dark:border-zinc-700 ${tab === "json-to-yaml" ? "bg-emerald-600 text-white" : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}>
+            <button onClick={() => handleTabChange("json-to-yaml")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors border-r border-zinc-200 ${tab === "json-to-yaml" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
               JSON to YAML
             </button>
-            <button onClick={() => handleTabChange("diff")} className={`px-3.5 py-1.5 text-xs font-semibold transition-colors ${tab === "diff" ? "bg-emerald-600 text-white" : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}>
+            <button onClick={() => handleTabChange("diff")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors ${tab === "diff" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
               Diff
             </button>
           </div>
@@ -620,19 +646,19 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
           {tab === "format" && (
             <>
               <select value={indent} onChange={(e) => setIndent(Number(e.target.value))}
-                className="text-xs px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 cursor-pointer">
+                className="text-sm px-2.5 py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-600 cursor-pointer">
                 <option value={2}>Indent: 2</option>
                 <option value={4}>Indent: 4</option>
                 <option value={8}>Indent: 8</option>
               </select>
-              <label className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 cursor-pointer select-none">
+              <label className="flex items-center gap-1.5 text-xs text-zinc-500 cursor-pointer select-none">
                 <input type="checkbox" checked={sortKeys} onChange={(e) => setSortKeys(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded border-zinc-300 dark:border-zinc-600 text-emerald-600 focus:ring-emerald-500 cursor-pointer" />
+                  className="w-3.5 h-3.5 rounded border-zinc-300 text-blue-600 focus:ring-blue-500 cursor-pointer" />
                 Sort keys
               </label>
-              <label className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 cursor-pointer select-none">
+              <label className="flex items-center gap-1.5 text-xs text-zinc-500 cursor-pointer select-none">
                 <input type="checkbox" checked={autoFormat} onChange={(e) => setAutoFormat(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded border-zinc-300 dark:border-zinc-600 text-emerald-600 focus:ring-emerald-500 cursor-pointer" />
+                  className="w-3.5 h-3.5 rounded border-zinc-300 text-blue-600 focus:ring-blue-500 cursor-pointer" />
                 Auto
               </label>
             </>
@@ -648,21 +674,21 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
                   inputEditor.current.dispatch({ changes: { from: 0, to: inputEditor.current.state.doc.length, insert: text } });
                 }
               } catch {}
-            }} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Paste from clipboard">
+            }} className="px-3 py-1.5 text-base font-medium rounded-lg border border-zinc-200 text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100 transition-colors" title="Paste from clipboard">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
             </button>
-            <button onClick={handleClear} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+            <button onClick={handleClear} className="px-3 py-1.5 text-base font-medium rounded-lg border border-zinc-200 text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100 transition-colors">
               Clear
             </button>
             <button
               onClick={() => { setShowUrlInput(true); setUrlLoadError(null); }}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="px-3 py-1.5 text-base font-medium rounded-lg border border-zinc-200 text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
               title="Load YAML from a URL"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
             </button>
             <button onClick={handleCopy}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${copied ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800" : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"}`}>
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-base font-semibold rounded-lg transition-all ${copied ? "bg-blue-50 text-blue-700 border border-blue-200" : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"}`}>
               {copied ? (
                 <><svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg> Copied</>
               ) : (
@@ -671,7 +697,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
             </button>
             {output && !error && (
               <button onClick={handleShare}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${shareCopied ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300" : "border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}>
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-base font-medium rounded-lg border transition-colors ${shareCopied ? "border-blue-200 bg-blue-50 text-blue-700" : "border-zinc-200 text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100"}`}>
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                 {shareCopied ? "Link Copied" : "Share"}
               </button>
@@ -681,33 +707,33 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
 
         {/* Editors */}
                   {tab === "schema" && (
-            <div className="px-4 py-2 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50/80 dark:bg-zinc-950/80">
-              <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 block mb-1.5">JSON Schema</label>
+            <div className="px-4 py-2 border-b border-zinc-200 bg-zinc-50/80">
+              <label className="text-xs font-semibold text-zinc-500 block mb-1.5">JSON Schema</label>
               <textarea
                 value={schemaInput}
                 onChange={(e) => setSchemaInput(e.target.value)}
                 placeholder="Enter a JSON Schema to validate your YAML against..."
                 rows={4}
-                className="w-full h-[80px] px-3 py-2 text-xs font-mono rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none"
+                className="w-full h-[80px] px-3 py-2 text-xs font-mono rounded-lg border border-zinc-200 bg-white text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
               />
               <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                <span className="text-xs text-zinc-400 dark:text-zinc-500">Try:</span>
-                <button onClick={() => setSchemaInput('{"type":"object","required":["apiVersion","kind","metadata"],"properties":{"apiVersion":{"type":"string"},"kind":{"type":"string","enum":["Deployment","Service","Pod"]},"metadata":{"type":"object","required":["name"],"properties":{"name":{"type":"string"},"labels":{"type":"object"}}}}}')} className="px-2 py-0.5 text-xs rounded-md border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-emerald-300 dark:hover:border-emerald-700 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer">K8s Object</button>
-                <button onClick={() => setSchemaInput('{"type":"object","required":["services"],"properties":{"services":{"type":"object","additionalProperties":{"type":"object","properties":{"image":{"type":"string"},"ports":{"type":"array"}}}}}}')} className="px-2 py-0.5 text-xs rounded-md border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-emerald-300 dark:hover:border-emerald-700 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer">Docker Compose</button>
-                <button onClick={() => setSchemaInput('{"type":"object","required":["on","jobs"],"properties":{"on":{"type":"object"},"jobs":{"type":"object","additionalProperties":{"type":"object","required":["runs-on","steps"],"properties":{"runs-on":{"type":"string"},"steps":{"type":"array"}}}}}}')} className="px-2 py-0.5 text-xs rounded-md border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-emerald-300 dark:hover:border-emerald-700 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer">GitHub Actions</button>
+                <span className="text-xs text-zinc-400">Try:</span>
+                <button onClick={() => setSchemaInput('{"type":"object","required":["apiVersion","kind","metadata"],"properties":{"apiVersion":{"type":"string"},"kind":{"type":"string","enum":["Deployment","Service","Pod"]},"metadata":{"type":"object","required":["name"],"properties":{"name":{"type":"string"},"labels":{"type":"object"}}}}}')} className="px-2 py-0.5 text-base rounded-md border border-zinc-200 text-zinc-500 hover:border-blue-300 hover:text-blue-600 transition-colors cursor-pointer">K8s Object</button>
+                <button onClick={() => setSchemaInput('{"type":"object","required":["services"],"properties":{"services":{"type":"object","additionalProperties":{"type":"object","properties":{"image":{"type":"string"},"ports":{"type":"array"}}}}}}')} className="px-2 py-0.5 text-base rounded-md border border-zinc-200 text-zinc-500 hover:border-blue-300 hover:text-blue-600 transition-colors cursor-pointer">Docker Compose</button>
+                <button onClick={() => setSchemaInput('{"type":"object","required":["on","jobs"],"properties":{"on":{"type":"object"},"jobs":{"type":"object","additionalProperties":{"type":"object","required":["runs-on","steps"],"properties":{"runs-on":{"type":"string"},"steps":{"type":"array"}}}}}}')} className="px-2 py-0.5 text-base rounded-md border border-zinc-200 text-zinc-500 hover:border-blue-300 hover:text-blue-600 transition-colors cursor-pointer">GitHub Actions</button>
               </div>
             </div>
           )}
-        <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-zinc-200 dark:divide-zinc-700" style={{ "--cm-gutter": "#9ca3af", "--cm-active-line": "#f4f4f5" } as React.CSSProperties}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-zinc-200" style={{ "--cm-gutter": "rgba(37,99,235,0.38)", "--cm-active-line": "rgba(37,99,235,0.05)" } as React.CSSProperties}>
           {/* Input */}
-          <div ref={editorParentRef} className={`relative bg-white dark:bg-zinc-950 [&_.cm-editor]:h-[440px] lg:[&_.cm-editor]:h-[520px] [&_.cm-editor]:outline-none [&_.cm-scroller]:overscroll-contain ${isDragging ? "ring-2 ring-emerald-400 ring-inset" : ""}`}>
+          <div ref={editorParentRef} className={`relative bg-white [&_.cm-editor]:h-[440px] lg:[&_.cm-editor]:h-[520px] [&_.cm-editor]:outline-none [&_.cm-scroller]:overscroll-contain ${isDragging ? "ring-2 ring-blue-400 ring-inset" : ""}`}>
             <div ref={inputRef} className="h-full" />
             {/* Drag & drop overlay */}
             {isDragging && (
-              <div className="absolute inset-0 flex items-center justify-center bg-emerald-50/80 dark:bg-emerald-950/50 z-10 pointer-events-none">
+              <div className="absolute inset-0 flex items-center justify-center bg-blue-50/80 z-10 pointer-events-none">
                 <div className="text-center">
-                  <svg className="w-10 h-10 mx-auto text-emerald-500 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14.5 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /></svg>
-                  <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Drop .yaml or .yml file</span>
+                  <svg className="w-10 h-10 mx-auto text-blue-500 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14.5 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /></svg>
+                  <span className="text-sm font-medium text-blue-700">Drop .yaml or .yml file</span>
                 </div>
               </div>
             )}
@@ -718,12 +744,12 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
             {/* Mode indicator */}
             {tab !== "format" && (
               <div className="absolute top-2 left-2 z-10">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-md bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-md bg-blue-100 text-blue-700 border border-blue-200">
                   {tab === "to-json" ? "YAML → JSON" : tab === "json-to-yaml" ? "JSON → YAML" : tab === "diff" ? "Diff" : "Schema"}
                 </span>
               </div>
             )}
-            <div className="h-full bg-zinc-50/50 dark:bg-zinc-950/50 overflow-auto">
+            <div className="h-full bg-zinc-50/50 overflow-auto">
             {tab === "diff" && diffChanges.length > 0 ? (
               <div className="font-mono text-sm h-full">
                 {output.split("\n").map((line, i) => {
@@ -731,59 +757,91 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
                   let bg = "";
                   let prefix = "  ";
                   if (change?.type === "added") {
-                    bg = "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300";
+                    bg = "bg-blue-50 text-blue-800";
                     prefix = "+ ";
                   } else if (change?.type === "removed") {
-                    bg = "bg-red-50 dark:bg-red-950/20 text-red-800 dark:text-red-300";
+                    bg = "bg-red-50 text-red-800";
                     prefix = "- ";
                   } else if (change?.type === "modified") {
-                    bg = "bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300";
+                    bg = "bg-amber-50 text-amber-800";
                     prefix = "~ ";
                   }
                   return (
                     <div key={i} className={`flex px-4 py-0.5 ${bg} min-h-[1.6em]`}>
-                      <span className="w-6 text-right mr-3 text-zinc-300 dark:text-zinc-600 select-none shrink-0">{i + 1}</span>
-                      <span className={change ? "font-medium" : "text-zinc-500 dark:text-zinc-400"}>{prefix}{line || "\u00A0"}</span>
+                      <span className="w-6 text-right mr-3 text-zinc-300 select-none shrink-0">{i + 1}</span>
+                      <span className={change ? "font-medium" : "text-zinc-500"}>{prefix}{line || "\u00A0"}</span>
                     </div>
                   );
                 })}
+              </div>
+            ) : tab === "schema" ? (
+              <div className="p-5 h-full">
+                {schemaValidating ? (
+                  <div className="text-sm text-zinc-400">Validating against schema…</div>
+                ) : !schemaResult ? (
+                  <div className="text-sm text-zinc-400">
+                    Enter a JSON Schema above to validate your YAML against it.
+                  </div>
+                ) : schemaResult.valid ? (
+                  <div className="flex items-center gap-2 text-sm font-medium text-zinc-700">
+                    <svg className="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
+                    Valid — your YAML conforms to the schema.
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-medium text-red-600">
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
+                      Validation failed — {schemaResult.errors.length} error{schemaResult.errors.length === 1 ? "" : "s"}
+                    </div>
+                    {schemaResult.errors.slice(0, 12).map((e, i) => (
+                      <div key={i} className="text-xs text-zinc-600 bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2">
+                        <span className="font-mono text-red-500">{e.path || "(root)"}</span>
+                        <span className="mx-2 text-zinc-300">·</span>
+                        {e.message}
+                      </div>
+                    ))}
+                    {schemaResult.errors.length > 12 && (
+                      <div className="text-xs text-zinc-400">…and {schemaResult.errors.length - 12} more</div>
+                    )}
+                  </div>
+                )}
               </div>
             ) : error ? (
               <div className="p-5 font-mono text-sm h-full">
                 <div className="flex items-center gap-2 mb-4">
                   <svg className="w-5 h-5 text-red-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
-                  <span className="font-semibold text-red-600 dark:text-red-400">{tab === "json-to-yaml" ? "JSON Syntax Error" : "YAML Syntax Error"}</span>
+                  <span className="font-semibold text-red-600">{tab === "json-to-yaml" ? "JSON Syntax Error" : "YAML Syntax Error"}</span>
                 </div>
-                <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                  <div className="text-red-800 dark:text-red-200 font-medium mb-2">Line {error.line}, Column {error.col}</div>
-                  <div className="text-red-700 dark:text-red-300 text-sm leading-relaxed">{error.message}</div>
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="text-red-800 font-medium mb-2">Line {error.line}, Column {error.col}</div>
+                  <div className="text-red-700 text-sm leading-relaxed">{error.message}</div>
                 </div>
                 {(tab === "json-to-yaml") ? (
-                  <div className="mt-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 space-y-2.5">
+                  <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2.5">
                     <div className="flex items-start gap-2">
                       <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0018 8 6 6 0 006 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 018.91 14"/></svg>
-                      <p className="text-amber-700 dark:text-amber-300 text-sm leading-relaxed">This input looks like YAML, not JSON. The <strong className="font-semibold">JSON to YAML</strong> converter requires valid JSON input (starting with <code className="px-1 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-xs font-mono">{'{'}</code> or <code className="px-1 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-xs font-mono">[</code>).</p>
+                      <p className="text-amber-700 text-sm leading-relaxed">This input looks like YAML, not JSON. The <strong className="font-semibold">JSON to YAML</strong> converter requires valid JSON input (starting with <code className="px-1 py-0.5 rounded bg-amber-100 text-xs font-mono">{'{'}</code> or <code className="px-1 py-0.5 rounded bg-amber-100 text-xs font-mono">[</code>).</p>
                     </div>
-                    <button onClick={() => setTab("format")} className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition-colors">
+                    <button onClick={() => setTab("format")} className="inline-flex items-center gap-1.5 px-3.5 py-2 text-base font-semibold rounded-lg bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition-colors">
                       Switch to Format
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
                     </button>
                   </div>
                 ) : getErrorHint(error.message) && (
-                  <div className="mt-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 flex items-start gap-2">
+                  <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
                     <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    <span className="text-amber-700 dark:text-amber-300 text-sm">{getErrorHint(error.message)}</span>
+                    <span className="text-amber-700 text-sm">{getErrorHint(error.message)}</span>
                   </div>
                 )}
-                <div className="mt-4 text-xs text-zinc-400 dark:text-zinc-500">
+                <div className="mt-4 text-xs text-zinc-400">
                   Fix the error in the input panel and the output will update automatically.
                 </div>
               </div>
             ) : output ? (
-              <pre className="p-5 font-mono text-sm text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed">{output}</pre>
+              <pre className="p-5 font-mono text-sm text-zinc-800 whitespace-pre-wrap leading-relaxed">{output}</pre>
             ) : (
               <div className="flex items-center justify-center h-full">
-                <span className="text-sm text-zinc-400 dark:text-zinc-500">
+                <span className="text-sm text-zinc-400">
                   {tab === "format" ? "Formatted YAML will appear here" : tab === "to-json" ? "JSON output will appear here" : tab === "json-to-yaml" ? "YAML output will appear here" : tab === "diff" ? "Diff view — format first to see changes" : "Enter a JSON Schema above to validate your YAML"}
                 </span>
               </div>
@@ -792,7 +850,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
             {output && !error && tab !== "diff" && tab !== "schema" && (
               <div className="absolute bottom-3 right-3 z-10">
                 <button onClick={handleCopy}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg transition-all">
+                  className="flex items-center gap-2 px-4 py-2 text-base font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                   {copied ? "Copied!" : "Copy Result"}
                 </button>
@@ -802,60 +860,60 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
         </div>
 
         {/* Status bar */}
-        <div className="flex items-center gap-4 px-4 py-1.5 border-t border-zinc-200 dark:border-zinc-700 bg-zinc-50/80 dark:bg-zinc-950/80 text-xs text-zinc-400 dark:text-zinc-500 font-mono">
+        <div className="flex items-center gap-4 px-4 py-1.5 border-t border-zinc-200 bg-zinc-50/80 text-xs text-zinc-400 font-mono">
           <div className="flex items-center gap-1.5">
             {error ? (
-              <span className="inline-flex items-center gap-1 text-red-500 dark:text-red-400">
+              <span className="inline-flex items-center gap-1 text-red-500">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Invalid
               </span>
             ) : input.trim() ? (
-              <span className="inline-flex items-center gap-1 text-emerald-500 dark:text-emerald-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Valid
+              <span className="inline-flex items-center gap-1 text-blue-500">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Valid
               </span>
             ) : (
               <span className="inline-flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-600" /> Empty
+                <span className="w-1.5 h-1.5 rounded-full bg-zinc-300" /> Empty
               </span>
             )}
           </div>
-          <span className="text-zinc-300 dark:text-zinc-600">|</span>
+          <span className="text-zinc-300">|</span>
           <span>{inputLines} lines</span>
           <span>{input.length.toLocaleString()} chars</span>
           {docCount > 1 && (
             <>
-              <span className="text-zinc-300 dark:text-zinc-600">|</span>
-              <span className="text-emerald-500 dark:text-emerald-400">{docCount} docs</span>
+              <span className="text-zinc-300">|</span>
+              <span className="text-blue-500">{docCount} docs</span>
             </>
           )}
           {formatTime !== null && (
             <>
-              <span className="text-zinc-300 dark:text-zinc-600">|</span>
-              <span className="text-emerald-500 dark:text-emerald-400">
+              <span className="text-zinc-300">|</span>
+              <span className="text-blue-500">
                 Formatted in {formatTime < 1 ? "<1" : formatTime.toFixed(formatTime < 10 ? 1 : 0)}ms
               </span>
             </>
           )}
-          <span className="text-zinc-300 dark:text-zinc-600">|</span>
+          <span className="text-zinc-300">|</span>
           <span>Ctrl+Enter to format</span>
-          <span className="text-zinc-300 dark:text-zinc-600">|</span>
+          <span className="text-zinc-300">|</span>
           <span>YAML 1.2</span>
         </div>
       </div>
 
       {/* Examples */}
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">Try an example:</span>
+        <span className="text-xs text-zinc-400 font-medium">Try an example:</span>
         {tab === "json-to-yaml" ? (
           Object.entries({ "package.json": "Package.json", dockerConfig: "Docker Config", ciConfig: "CI Config" }).map(([id, label]) => (
             <button key={id} onClick={() => handleLoadExample(id, true)}
-              className="px-2.5 py-1 text-xs rounded-md border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-emerald-300 dark:hover:border-emerald-700 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer">
+              className="px-2.5 py-1 text-base rounded-md border border-zinc-200 text-zinc-500 hover:border-blue-300 hover:text-blue-600 transition-colors cursor-pointer">
               {label}
             </button>
           ))
         ) : (
           Object.entries({ kubernetes: "K8s Deploy", docker: "Docker Compose", ansible: "Ansible", github: "CI/CD" }).map(([id, label]) => (
             <button key={id} onClick={() => handleLoadExample(id)}
-              className="px-2.5 py-1 text-xs rounded-md border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-emerald-300 dark:hover:border-emerald-700 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer">
+              className="px-2.5 py-1 text-base rounded-md border border-zinc-200 text-zinc-500 hover:border-blue-300 hover:text-blue-600 transition-colors cursor-pointer">
               {label}
             </button>
           ))
@@ -865,8 +923,8 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
       {/* URL Load Modal */}
       {showUrlInput && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={() => setShowUrlInput(false)}>
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-2xl p-6 w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Load YAML from URL</h3>
+          <div className="bg-white rounded-xl border border-zinc-200 shadow-2xl p-6 w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-sm font-semibold text-zinc-900 mb-3">Load YAML from URL</h3>
             <div className="flex gap-2">
               <input
                 type="url"
@@ -875,16 +933,16 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
                 onKeyDown={(e) => e.key === "Enter" && handleUrlLoad()}
                 placeholder="https://raw.githubusercontent.com/..."
                 autoFocus
-                className="flex-1 px-3 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                className="flex-1 px-3 py-2 text-sm rounded-lg border border-zinc-200 bg-white text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
               <button onClick={handleUrlLoad} disabled={urlLoading || !urlLoadValue.trim()}
-                className="px-4 py-2 text-sm font-medium rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors">
+                className="px-4 py-2 text-base font-medium rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors">
                 {urlLoading ? "Loading..." : "Load"}
               </button>
             </div>
             {urlLoadError && (
               <p className="mt-2 text-xs text-red-500">{urlLoadError}</p>
             )}
-            <p className="mt-3 text-xs text-zinc-400 dark:text-zinc-500">
+            <p className="mt-3 text-xs text-zinc-400">
               Paste a link to a raw YAML file (GitHub raw, Gist, etc.)
             </p>
           </div>

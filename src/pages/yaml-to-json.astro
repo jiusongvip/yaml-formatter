@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 import ToolPanel from '../components/ToolPanel';
 
 const jsonLd = {
@@ -16,23 +18,14 @@ const jsonLd = {
       browserRequirements: 'Requires JavaScript',
     },
     {
-      '@type': 'HowTo',
-      name: 'How to Convert YAML to JSON',
-      step: [
-        { '@type': 'HowToStep', position: 1, name: 'Paste or Upload YAML', text: 'Paste your YAML content or drag and drop a .yaml file into the editor.' },
-        { '@type': 'HowToStep', position: 2, name: 'Click the YAML to JSON tab', text: 'The conversion happens instantly in your browser using the yaml.js parser. All data stays local.' },
-        { '@type': 'HowToStep', position: 3, name: 'Copy the JSON', text: 'Copy the formatted JSON output and use it in your API, application, or data pipeline.' },
-      ],
-    },
-    {
       '@type': 'FAQPage',
       mainEntity: [
         { '@type': 'Question', name: 'Is the YAML to JSON conversion accurate?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. We use the yaml library (v2) which follows the YAML 1.2 specification. All data types, nested structures, and values are preserved exactly during conversion. The conversion is fully lossless.' } },
         { '@type': 'Question', name: 'Does this tool send my data to a server?', acceptedAnswer: { '@type': 'Answer', text: 'No. All YAML to JSON conversion runs entirely in your browser using client-side JavaScript. Your data never leaves your computer. You can disconnect from the internet and the converter will continue to work.' } },
         { '@type': 'Question', name: 'Does it handle YAML anchors and aliases?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. YAML anchors (&) and aliases (*) are fully resolved during conversion. The resulting JSON contains the expanded, actual values. Merge keys (<<) are also supported.' } },
-        { '@type': 'Question', name: 'Can I convert large YAML files?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. The tool handles files with thousands of lines efficiently. For extremely large files (10,000+ lines), conversion may take a moment but remains fully client-side. You can also drag and drop .yaml or .yml files directly into the editor.' } },
         { '@type': 'Question', name: 'What happens to YAML comments during conversion?', acceptedAnswer: { '@type': 'Answer', text: 'Comments are dropped during conversion because JSON does not support comments. This is by design — the JSON specification has no comment syntax.' } },
         { '@type': 'Question', name: 'How are YAML data types mapped to JSON?', acceptedAnswer: { '@type': 'Answer', text: 'YAML strings, numbers, booleans, and null map directly to JSON equivalents. YAML sequences become JSON arrays. YAML mappings become JSON objects. YAML dates are converted to ISO 8601 strings.' } },
+        { '@type': 'Question', name: 'Can I convert large YAML files?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. The tool handles files with thousands of lines efficiently, fully client-side. You can also drag and drop .yaml or .yml files directly into the editor.' } },
       ],
     },
     {
@@ -44,429 +37,8 @@ const jsonLd = {
     },
   ],
 };
----
 
-<BaseLayout
-  title="YAML to JSON Converter - Free Online YAML to JSON Tool"
-  description="Convert YAML to JSON instantly in your browser. Free online converter, zero server upload. Supports nested objects, arrays, anchors, and aliases."
->
-  <header class="sticky top-0 z-50 border-b border-zinc-200/60 dark:border-zinc-800/60 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md">
-    <nav class="max-w-7xl mx-auto flex items-center justify-between h-14 px-4 sm:px-6 lg:px-8">
-      <a href="/" class="flex items-center gap-2.5 group">
-        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-600 text-white font-bold text-sm group-hover:bg-emerald-700 transition-colors">Y</span>
-        <span class="font-semibold text-base tracking-tight text-zinc-900 dark:text-zinc-100">YAML Formatter</span>
-      </a>
-      <div class="flex items-center gap-4">
-        <a href="/" class="text-sm text-zinc-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Formatter</a>
-        <a href="/blog/yaml-syntax-guide" class="text-sm text-zinc-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Blog</a>
-        <button id="theme-toggle" class="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100" aria-label="Toggle theme">
-          <svg id="sun-icon" class="w-4 h-4 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <svg id="moon-icon" class="w-4 h-4 block dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
-      </div>
-    </nav>
-  </header>
-  <script>
-    const btn = document.getElementById('theme-toggle');
-    btn?.addEventListener('click', () => {
-      const isDark = document.documentElement.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
-  </script>
-
-  <main>
-    <section class="pt-20 pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
-      <nav class="flex items-center justify-center gap-2 text-sm text-zinc-400 dark:text-zinc-500 mb-4">
-        <a href="/" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Home</a>
-        <span>/</span>
-        <span class="text-zinc-600 dark:text-zinc-300">YAML to JSON Converter</span>
-      </nav>
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tighter text-zinc-900 dark:text-zinc-50">YAML to JSON Converter</h1>
-      <p class="mt-4 text-lg sm:text-xl text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto leading-relaxed">Convert YAML to JSON <span class="text-zinc-700 dark:text-zinc-300 font-medium">instantly</span> in your browser. No upload, no server.</p>
-      <div class="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-sm text-emerald-700 dark:text-emerald-300 font-medium">
-        <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Your data never leaves your browser. 100% client-side.
-      </div>
-    </section>
-
-    <ToolPanel client:idle initialTab="to-json" />
-
-    <!-- Code Comparison -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-3 text-center">YAML to JSON: Side-by-Side Comparison</h2>
-      <p class="text-center text-zinc-500 dark:text-zinc-400 mb-8 max-w-2xl mx-auto">See how the same data structure looks in YAML versus JSON. YAML uses indentation and minimal syntax, while JSON uses braces, brackets, and quotes.</p>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-          <div class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span class="text-xs font-semibold text-zinc-600 dark:text-zinc-300">YAML Input</span>
-          </div>
-          <pre id="cmp-yaml" class="p-4 text-sm font-mono"></pre>
-        </div>
-        <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-          <div class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-            <span class="text-xs font-semibold text-zinc-600 dark:text-zinc-300">JSON Output</span>
-          </div>
-          <pre id="cmp-json" class="p-4 text-sm font-mono"></pre>
-        </div>
-      </div>
-    </section>
-
-    <!-- Key Features -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-8 text-center">Key Features</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <div class="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <div class="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-3">
-            <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-          </div>
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1.5">YAML 1.2 Compliant</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Full support for the YAML 1.2 specification including proper boolean handling, null values, and numeric type detection.</p>
-        </div>
-        <div class="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <div class="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-3">
-            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          </div>
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1.5">100% Client-Side</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">All conversion runs in your browser. Your data is never uploaded to any server. Works offline after page load.</p>
-        </div>
-        <div class="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <div class="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-3">
-            <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-          </div>
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1.5">Anchor Resolution</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">YAML anchors (&amp;) and aliases (*) are fully resolved. The JSON output contains expanded, actual values.</p>
-        </div>
-        <div class="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <div class="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-3">
-            <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          </div>
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1.5">Multi-Document Support</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Handles YAML files with multiple documents separated by <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">---</code>. Each document is converted independently.</p>
-        </div>
-        <div class="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <div class="w-9 h-9 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-3">
-            <svg class="w-5 h-5 text-red-600 dark:text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          </div>
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1.5">Syntax Error Detection</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Instant error reporting with exact line and column numbers. Get actionable hints to fix common YAML syntax issues.</p>
-        </div>
-        <div class="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <div class="w-9 h-9 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center mb-3">
-            <svg class="w-5 h-5 text-cyan-600 dark:text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          </div>
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1.5">File Drag &amp; Drop</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Drag and drop <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">.yaml</code> or <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">.yml</code> files directly into the editor for instant conversion.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Why Convert YAML to JSON -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-3 text-center">Why Convert YAML to JSON?</h2>
-      <p class="text-center text-zinc-500 dark:text-zinc-400 mb-8 max-w-2xl mx-auto">YAML and JSON serve different purposes. Converting between them is a daily task for developers working across configuration, APIs, and data pipelines.</p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">REST API Payloads</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Most REST APIs expect JSON request bodies. Write your payloads in readable YAML, then convert to JSON for <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">curl</code>, Postman, or HTTP clients.</p>
-        </div>
-        <div class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">JavaScript / TypeScript Apps</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">JavaScript natively parses JSON with <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">JSON.parse()</code>. Convert YAML configs to JSON for zero-dependency loading in Node.js or browser apps.</p>
-        </div>
-        <div class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">NoSQL Database Import</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">MongoDB, CouchDB, and Elasticsearch use JSON documents. Convert your YAML seed data or fixtures to JSON for direct database import.</p>
-        </div>
-        <div class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">CI/CD Pipeline Config</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Some tools require JSON while others use YAML. Convert between formats when migrating between GitHub Actions, GitLab CI, or Jenkins pipelines.</p>
-        </div>
-        <div class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">Schema Validation</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">JSON Schema is the industry standard for data validation. Convert your YAML data to JSON to validate against schemas using tools like Ajv or Express middleware.</p>
-        </div>
-        <div class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">Infrastructure as Code</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Terraform, CloudFormation, and Pulumi accept JSON templates. Convert from YAML versions for compatibility with tools that only accept JSON input.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- YAML vs JSON Key Differences -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-8 text-center">YAML vs JSON: Key Differences</h2>
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-          <thead>
-            <tr class="bg-zinc-50 dark:bg-zinc-900">
-              <th class="px-4 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800">Feature</th>
-              <th class="px-4 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800">YAML</th>
-              <th class="px-4 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800">JSON</th>
-            </tr>
-          </thead>
-          <tbody class="text-zinc-600 dark:text-zinc-400">
-            <tr class="border-b border-zinc-100 dark:border-zinc-800/50"><td class="px-4 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">Syntax</td><td class="px-4 py-2.5">Indentation-based, minimal punctuation</td><td class="px-4 py-2.5">Braces, brackets, quotes, commas</td></tr>
-            <tr class="border-b border-zinc-100 dark:border-zinc-800/50"><td class="px-4 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">Comments</td><td class="px-4 py-2.5">Supported (<code class="text-xs">#</code>)</td><td class="px-4 py-2.5">Not supported</td></tr>
-            <tr class="border-b border-zinc-100 dark:border-zinc-800/50"><td class="px-4 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">Data Types</td><td class="px-4 py-2.5">Strings, numbers, booleans, null, dates</td><td class="px-4 py-2.5">Strings, numbers, booleans, null</td></tr>
-            <tr class="border-b border-zinc-100 dark:border-zinc-800/50"><td class="px-4 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">Anchors / References</td><td class="px-4 py-2.5">Supported (<code class="text-xs">&amp;</code> / <code class="text-xs">*</code>)</td><td class="px-4 py-2.5">Not supported</td></tr>
-            <tr class="border-b border-zinc-100 dark:border-zinc-800/50"><td class="px-4 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">Multi-document</td><td class="px-4 py-2.5">Supported (<code class="text-xs">---</code> separator)</td><td class="px-4 py-2.5">Not supported</td></tr>
-            <tr class="border-b border-zinc-100 dark:border-zinc-800/50"><td class="px-4 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">File Size</td><td class="px-4 py-2.5">More compact (no quotes/braces)</td><td class="px-4 py-2.5">Larger (verbose syntax)</td></tr>
-            <tr><td class="px-4 py-2.5 font-medium text-zinc-800 dark:text-zinc-200">Parsing Speed</td><td class="px-4 py-2.5">Slower (complex spec)</td><td class="px-4 py-2.5">Faster (simple spec, native support)</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-3 text-center">How to Convert YAML to JSON</h2>
-      <p class="text-center text-zinc-500 dark:text-zinc-400 mb-10 max-w-2xl mx-auto">Three simple steps to convert your YAML documents to JSON format — all processed locally in your browser.</p>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="text-center">
-          <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-bold text-lg mb-4">1</span>
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 text-lg mb-2">Paste Your YAML</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">Copy your YAML from any source — a Kubernetes manifest, a CI/CD pipeline, or a configuration file — and paste it into the editor. You can also drag and drop <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">.yaml</code> files directly.</p>
-        </div>
-        <div class="text-center">
-          <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold text-lg mb-4">2</span>
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 text-lg mb-2">Click YAML to JSON</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">Switch to the "YAML to JSON" tab above the editor. The conversion happens instantly using the <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">yaml</code> library (v2), which follows the YAML 1.2 specification.</p>
-        </div>
-        <div class="text-center">
-          <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold text-lg mb-4">3</span>
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 text-lg mb-2">Copy the JSON</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">Copy the formatted JSON output with one click. Use it in your REST API, Node.js application, NoSQL database import, or any tool that expects JSON input.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Common Conversion Errors -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-3 text-center">Common Conversion Errors</h2>
-      <p class="text-center text-zinc-500 dark:text-zinc-400 mb-8 max-w-2xl mx-auto">Avoid these frequent pitfalls when converting between YAML and JSON formats.</p>
-      <div class="space-y-4">
-        <div class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Tabs in YAML</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">YAML forbids tab characters for indentation. Using tabs causes parse errors that prevent conversion. Replace all tabs with spaces (2 or 4 per level) before converting.</p>
-        </div>
-        <div class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Unquoted Special Values</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Values like <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">true</code>, <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">false</code>, <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">null</code>, <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">yes</code>, <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">no</code> are interpreted as booleans/null in YAML. If you need them as strings, wrap them in quotes: <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">"yes"</code>.</p>
-        </div>
-        <div class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Comments Lost in Conversion</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">JSON does not support comments. All YAML comments (<code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">#</code>) are dropped during conversion. Add documentation separately or use descriptive key names.</p>
-        </div>
-        <div class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Inconsistent Indentation</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Mixing 2-space and 4-space indents within the same YAML block causes parse errors. Use consistent indentation throughout your document before converting.</p>
-        </div>
-        <div class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Missing Colon Separator</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Every YAML mapping key requires a colon followed by a space (<code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">key: value</code>). Forgetting the colon or the trailing space is one of the most common YAML syntax errors.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Data Type Mapping Reference -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-3 text-center">YAML to JSON Data Type Mapping</h2>
-      <p class="text-center text-zinc-500 dark:text-zinc-400 mb-8 max-w-2xl mx-auto">Complete reference for how YAML data types are converted to their JSON equivalents.</p>
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-          <thead>
-            <tr class="bg-zinc-50 dark:bg-zinc-900">
-              <th class="px-4 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800">YAML Type</th>
-              <th class="px-4 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800">YAML Example</th>
-              <th class="px-4 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800">JSON Type</th>
-              <th class="px-4 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800">JSON Result</th>
-            </tr>
-          </thead>
-          <tbody class="text-zinc-600 dark:text-zinc-400 font-mono text-xs">
-            <tr class="border-b border-zinc-100 dark:border-zinc-800/50"><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">String</td><td class="px-4 py-2.5">hello</td><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">String</td><td class="px-4 py-2.5">"hello"</td></tr>
-            <tr class="border-b border-zinc-100 dark:border-zinc-800/50"><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">Integer</td><td class="px-4 py-2.5">42</td><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">Number</td><td class="px-4 py-2.5">42</td></tr>
-            <tr class="border-b border-zinc-100 dark:border-zinc-800/50"><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">Float</td><td class="px-4 py-2.5">3.14</td><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">Number</td><td class="px-4 py-2.5">3.14</td></tr>
-            <tr class="border-b border-zinc-100 dark:border-zinc-800/50"><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">Boolean</td><td class="px-4 py-2.5">true</td><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">Boolean</td><td class="px-4 py-2.5">true</td></tr>
-            <tr class="border-b border-zinc-100 dark:border-zinc-800/50"><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">Null</td><td class="px-4 py-2.5">null / ~</td><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">Null</td><td class="px-4 py-2.5">null</td></tr>
-            <tr class="border-b border-zinc-100 dark:border-zinc-800/50"><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">Date</td><td class="px-4 py-2.5">2025-01-15</td><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">String</td><td class="px-4 py-2.5">"2025-01-15"</td></tr>
-            <tr class="border-b border-zinc-100 dark:border-zinc-800/50"><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">Sequence</td><td class="px-4 py-2.5">- a<br>- b</td><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">Array</td><td class="px-4 py-2.5">["a", "b"]</td></tr>
-            <tr><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">Mapping</td><td class="px-4 py-2.5">key: val</td><td class="px-4 py-2.5 text-zinc-800 dark:text-zinc-200 font-sans text-sm">Object</td><td class="px-4 py-2.5">&#123;"key": "val"&#125;</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- NEW: YAML Anchors & Aliases -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-3 text-center">Understanding YAML Anchors &amp; Aliases in Conversion</h2>
-      <p class="text-center text-zinc-500 dark:text-zinc-400 mb-8 max-w-2xl mx-auto">YAML anchors and aliases let you reuse values across your document. During conversion to JSON, all references are fully expanded — the output contains the actual values, not the references.</p>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-          <div class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span class="text-xs font-semibold text-zinc-600 dark:text-zinc-300">YAML with Anchors</span>
-          </div>
-          <pre id="anc-yaml" class="p-4 text-sm font-mono"></pre>
-        </div>
-        <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-          <div class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-            <span class="text-xs font-semibold text-zinc-600 dark:text-zinc-300">JSON — Fully Expanded</span>
-          </div>
-          <pre id="anc-json" class="p-4 text-sm font-mono"></pre>
-        </div>
-      </div>
-      <div class="mt-6 p-5 rounded-2xl border border-amber-200 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/20">
-        <p class="text-sm text-amber-800 dark:text-amber-300"><strong>Key insight:</strong> JSON has no equivalent for YAML anchors. The <code class="text-xs px-1 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40">&amp;defaults</code> anchor and <code class="text-xs px-1 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40">*defaults</code> alias are resolved into actual values. The merge key <code class="text-xs px-1 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40">&lt;&lt;</code> is also expanded. This means the JSON output may be larger than the YAML source — but the data is identical.</p>
-      </div>
-    </section>
-
-    <!-- NEW: Best Practices -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-3 text-center">Best Practices for YAML to JSON Conversion</h2>
-      <p class="text-center text-zinc-500 dark:text-zinc-400 mb-8 max-w-2xl mx-auto">Follow these guidelines to ensure smooth, error-free conversion every time.</p>
-      <div class="space-y-4">
-        <div class="flex gap-4 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <span class="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-bold text-sm">1</span>
-          <div><h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Validate YAML Before Converting</h3><p class="text-sm text-zinc-500 dark:text-zinc-400">Always check your YAML for syntax errors first. Use the YAML Formatter tab to validate and fix indentation issues before switching to the JSON conversion tab.</p></div>
-        </div>
-        <div class="flex gap-4 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <span class="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-bold text-sm">2</span>
-          <div><h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Use Spaces, Never Tabs</h3><p class="text-sm text-zinc-500 dark:text-zinc-400">YAML strictly forbids tab characters for indentation. Use 2 spaces per level for the cleanest, most portable YAML. Most editors have a "convert tabs to spaces" option.</p></div>
-        </div>
-        <div class="flex gap-4 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <span class="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 font-bold text-sm">3</span>
-          <div><h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Quote Ambiguous Values</h3><p class="text-sm text-zinc-500 dark:text-zinc-400">If a value like <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">yes</code>, <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">no</code>, <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">on</code>, or <code class="text-xs px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">off</code> should be a string (not a boolean), always wrap it in quotes in your YAML source.</p></div>
-        </div>
-        <div class="flex gap-4 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <span class="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold text-sm">4</span>
-          <div><h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Keep Nesting Reasonable</h3><p class="text-sm text-zinc-500 dark:text-zinc-400">Deeply nested YAML is hard to read and error-prone. When you exceed 4-5 levels of nesting, consider breaking the structure into separate files or using YAML anchors to reduce repetition.</p></div>
-        </div>
-        <div class="flex gap-4 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80">
-          <span class="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 font-bold text-sm">5</span>
-          <div><h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Plan for Comment Loss</h3><p class="text-sm text-zinc-500 dark:text-zinc-400">Since JSON drops all comments, move important documentation to a README file or use descriptive key names in your YAML. This preserves context that would otherwise be lost in conversion.</p></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- NEW: Real-World Examples -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-3 text-center">Real-World Conversion Examples</h2>
-      <p class="text-center text-zinc-500 dark:text-zinc-400 mb-10 max-w-2xl mx-auto">See how common DevOps configuration files look when converted from YAML to JSON.</p>
-      <div class="space-y-10">
-        <div>
-          <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Kubernetes Deployment</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-              <div class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span class="text-xs font-semibold text-zinc-600 dark:text-zinc-300">YAML</span></div>
-              <pre id="k8s-yaml" class="p-4 text-sm font-mono"></pre>
-            </div>
-            <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-              <div class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span><span class="text-xs font-semibold text-zinc-600 dark:text-zinc-300">JSON</span></div>
-              <pre id="k8s-json" class="p-4 text-sm font-mono"></pre>
-            </div>
-          </div>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Docker Compose</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-              <div class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span><span class="text-xs font-semibold text-zinc-600 dark:text-zinc-300">YAML</span></div>
-              <pre id="dk-yaml" class="p-4 text-sm font-mono"></pre>
-            </div>
-            <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-              <div class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span><span class="text-xs font-semibold text-zinc-600 dark:text-zinc-300">JSON</span></div>
-              <pre id="dk-json" class="p-4 text-sm font-mono"></pre>
-            </div>
-          </div>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-3">GitHub Actions Workflow</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-              <div class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span><span class="text-xs font-semibold text-zinc-600 dark:text-zinc-300">YAML</span></div>
-              <pre id="gh-yaml" class="p-4 text-sm font-mono"></pre>
-            </div>
-            <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-              <div class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span class="text-xs font-semibold text-zinc-600 dark:text-zinc-300">JSON</span></div>
-              <pre id="gh-json" class="p-4 text-sm font-mono"></pre>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Related Tools -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-8 text-center">Related Tools</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <a href="/" class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors group">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors mb-1">YAML Formatter</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Format, validate, and beautify YAML with consistent indentation.</p>
-        </a>
-        <a href="/json-to-yaml" class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors group">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors mb-1">JSON to YAML</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Convert JSON back to clean, readable YAML format.</p>
-        </a>
-        <a href="/blog/yaml-syntax-guide" class="p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors group">
-          <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors mb-1">YAML Syntax Guide</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">Learn YAML syntax, best practices, and common pitfalls.</p>
-        </a>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-8 text-center">Frequently Asked Questions</h2>
-      <dl class="space-y-2">
-        <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-          <dt><button type="button" class="faq-toggle flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors" aria-expanded="false"><span>Is the YAML to JSON conversion accurate?</span><svg class="faq-chevron w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button></dt>
-          <dd class="faq-answer hidden px-5 pb-4 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">Yes. We use the <code class="text-xs">yaml</code> library (v2) which follows the YAML 1.2 specification. All data types, nested structures, and values are preserved exactly during conversion. The conversion is fully lossless.</dd>
-        </div>
-        <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-          <dt><button type="button" class="faq-toggle flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors" aria-expanded="false"><span>Does this tool send my data to a server?</span><svg class="faq-chevron w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button></dt>
-          <dd class="faq-answer hidden px-5 pb-4 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">No. All YAML to JSON conversion runs entirely in your browser using client-side JavaScript. Your data never leaves your computer. You can disconnect from the internet and the converter will continue to work.</dd>
-        </div>
-        <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-          <dt><button type="button" class="faq-toggle flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors" aria-expanded="false"><span>Does it handle YAML anchors and aliases?</span><svg class="faq-chevron w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button></dt>
-          <dd class="faq-answer hidden px-5 pb-4 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">Yes. YAML anchors (<code class="text-xs">&amp;</code>) and aliases (<code class="text-xs">*</code>) are fully resolved during conversion. The resulting JSON contains the expanded, actual values — not the anchor references. Merge keys (<code class="text-xs">&lt;&lt;</code>) are also supported.</dd>
-        </div>
-        <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-          <dt><button type="button" class="faq-toggle flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors" aria-expanded="false"><span>Can I convert large YAML files?</span><svg class="faq-chevron w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button></dt>
-          <dd class="faq-answer hidden px-5 pb-4 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">Yes. The tool handles files with thousands of lines efficiently. For extremely large files (10,000+ lines), conversion may take a moment but remains fully client-side. You can also drag and drop <code class="text-xs">.yaml</code> or <code class="text-xs">.yml</code> files directly into the editor.</dd>
-        </div>
-        <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-          <dt><button type="button" class="faq-toggle flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors" aria-expanded="false"><span>What happens to YAML comments during conversion?</span><svg class="faq-chevron w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button></dt>
-          <dd class="faq-answer hidden px-5 pb-4 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">Comments are dropped during conversion because JSON does not support comments. This is by design — the JSON specification has no comment syntax. If you need to preserve documentation, consider adding descriptive key names in your YAML before converting.</dd>
-        </div>
-        <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-          <dt><button type="button" class="faq-toggle flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors" aria-expanded="false"><span>How are YAML data types mapped to JSON?</span><svg class="faq-chevron w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button></dt>
-          <dd class="faq-answer hidden px-5 pb-4 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">YAML strings, numbers, booleans (<code class="text-xs">true</code>/<code class="text-xs">false</code>), and null map directly to JSON equivalents. YAML sequences (lists) become JSON arrays. YAML mappings become JSON objects. YAML dates are converted to ISO 8601 strings.</dd>
-        </div>
-      </dl>
-    </section>
-  </main>
-
-  <footer class="border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/50">
-    <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-2 text-sm text-zinc-400 dark:text-zinc-500">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          Built for developers. Open source. No ads, no tracking.
-        </div>
-        <div class="flex items-center gap-6 text-sm">
-          <a href="/" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Formatter</a>
-          <a href="/blog/yaml-syntax-guide" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Blog</a>
-          <a href="/privacy" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Privacy</a>
-        </div>
-      </div>
-      <p class="mt-6 text-center text-xs text-zinc-400 dark:text-zinc-500">&copy; 2026 YAML Formatter. All processing is client-side.</p>
-    </div>
-  </footer>
-
-  <script type="text/plain" id="ex-cmp-yaml">name: my-app
+const cmpYaml = `name: my-app
 version: 1.0.0
 description: A sample application
 settings:
@@ -478,56 +50,25 @@ settings:
   database:
     host: db.example.com
     port: 5432
-    name: myapp_db</script>
-  <script type="text/plain" id="ex-cmp-json">&#123;
+    name: myapp_db`;
+
+const cmpJson = `{
   "name": "my-app",
   "version": "1.0.0",
   "description": "A sample application",
-  "settings": &#123;
+  "settings": {
     "debug": false,
     "port": 3000,
     "hosts": ["localhost", "0.0.0.0"],
-    "database": &#123;
+    "database": {
       "host": "db.example.com",
       "port": 5432,
       "name": "myapp_db"
-    &#125;
-  &#125;
-&#125;</script>
-  <script type="text/plain" id="ex-anc-yaml"># Define reusable defaults
-defaults: &amp;defaults
-  adapter: postgres
-  host: localhost
-  port: 5432
+    }
+  }
+}`;
 
-development:
-  database: myapp_dev
-  &lt;&lt;: *defaults
-
-production:
-  database: myapp_prod
-  &lt;&lt;: *defaults
-  host: db.prod.example.com</script>
-  <script type="text/plain" id="ex-anc-json">&#123;
-  "defaults": &#123;
-    "adapter": "postgres",
-    "host": "localhost",
-    "port": 5432
-  &#125;,
-  "development": &#123;
-    "database": "myapp_dev",
-    "adapter": "postgres",
-    "host": "localhost",
-    "port": 5432
-  &#125;,
-  "production": &#123;
-    "database": "myapp_prod",
-    "adapter": "postgres",
-    "host": "db.prod.example.com",
-    "port": 5432
-  &#125;
-&#125;</script>
-  <script type="text/plain" id="ex-k8s-yaml">apiVersion: apps/v1
+const k8sYaml = `apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-deployment
@@ -547,36 +88,38 @@ spec:
       - name: nginx
         image: nginx:1.25
         ports:
-        - containerPort: 80</script>
-  <script type="text/plain" id="ex-k8s-json">&#123;
+        - containerPort: 80`;
+
+const k8sJson = `{
   "apiVersion": "apps/v1",
   "kind": "Deployment",
-  "metadata": &#123;
+  "metadata": {
     "name": "nginx-deployment",
-    "labels": &#123; "app": "nginx" &#125;
-  &#125;,
-  "spec": &#123;
+    "labels": { "app": "nginx" }
+  },
+  "spec": {
     "replicas": 3,
-    "selector": &#123;
-      "matchLabels": &#123; "app": "nginx" &#125;
-    &#125;,
-    "template": &#123;
-      "metadata": &#123;
-        "labels": &#123; "app": "nginx" &#125;
-      &#125;,
-      "spec": &#123;
+    "selector": {
+      "matchLabels": { "app": "nginx" }
+    },
+    "template": {
+      "metadata": {
+        "labels": { "app": "nginx" }
+      },
+      "spec": {
         "containers": [
-          &#123;
+          {
             "name": "nginx",
             "image": "nginx:1.25",
-            "ports": [&#123; "containerPort": 80 &#125;]
-          &#125;
+            "ports": [{ "containerPort": 80 }]
+          }
         ]
-      &#125;
-    &#125;
-  &#125;
-&#125;</script>
-  <script type="text/plain" id="ex-dk-yaml">version: "3.8"
+      }
+    }
+  }
+}`;
+
+const dockerYaml = `version: "3.8"
 services:
   web:
     build: .
@@ -596,28 +139,30 @@ services:
   redis:
     image: redis:7-alpine
 volumes:
-  pgdata:</script>
-  <script type="text/plain" id="ex-dk-json">&#123;
+  pgdata:`;
+
+const dockerJson = `{
   "version": "3.8",
-  "services": &#123;
-    "web": &#123;
+  "services": {
+    "web": {
       "build": ".",
       "ports": ["3000:3000"],
-      "environment": &#123; "NODE_ENV": "production" &#125;,
+      "environment": { "NODE_ENV": "production" },
       "depends_on": ["db", "redis"]
-    &#125;,
-    "db": &#123;
+    },
+    "db": {
       "image": "postgres:15",
       "volumes": ["pgdata:/var/lib/postgresql/data"],
-      "environment": &#123; "POSTGRES_DB": "myapp" &#125;
-    &#125;,
-    "redis": &#123;
+      "environment": { "POSTGRES_DB": "myapp" }
+    },
+    "redis": {
       "image": "redis:7-alpine"
-    &#125;
-  &#125;,
-  "volumes": &#123; "pgdata": null &#125;
-&#125;</script>
-  <script type="text/plain" id="ex-gh-yaml">name: CI
+    }
+  },
+  "volumes": { "pgdata": null }
+}`;
+
+const ciYaml = `name: CI
 on:
   push:
     branches: [main]
@@ -631,47 +176,271 @@ jobs:
         node-version: [18, 20]
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js $&#123;&#123; matrix.node-version &#125;&#125;
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: $&#123;&#123; matrix.node-version &#125;&#125;
+          node-version: 20
       - run: npm ci
-      - run: npm test</script>
-  <script type="text/plain" id="ex-gh-json">&#123;
+      - run: npm test`;
+
+const ciJson = `{
   "name": "CI",
-  "on": &#123;
-    "push": &#123; "branches": ["main"] &#125;,
-    "pull_request": &#123; "branches": ["main"] &#125;
-  &#125;,
-  "jobs": &#123;
-    "test": &#123;
+  "on": {
+    "push": { "branches": ["main"] },
+    "pull_request": { "branches": ["main"] }
+  },
+  "jobs": {
+    "test": {
       "runs-on": "ubuntu-latest",
-      "strategy": &#123;
-        "matrix": &#123; "node-version": [18, 20] &#125;
-      &#125;,
+      "strategy": {
+        "matrix": { "node-version": [18, 20] }
+      },
       "steps": [
-        &#123; "uses": "actions/checkout@v4" &#125;,
-        &#123;
-          "name": "Use Node.js $&#123;&#123; matrix.node-version &#125;&#125;",
+        { "uses": "actions/checkout@v4" },
+        {
+          "name": "Use Node.js",
           "uses": "actions/setup-node@v4",
-          "with": &#123; "node-version": "$&#123;&#123; matrix.node-version &#125;&#125;" &#125;
-        &#125;,
-        &#123; "run": "npm ci" &#125;,
-        &#123; "run": "npm test" &#125;
+          "with": { "node-version": 20 }
+        },
+        { "run": "npm ci" },
+        { "run": "npm test" }
       ]
-    &#125;
-  &#125;
-&#125;</script>
-  <script>
-    document.querySelectorAll('script[type="text/plain"][id^="ex-"]').forEach(s => {
-      const id = s.id.slice(3);
-      const el = document.getElementById(id);
-      if (el) el.textContent = s.textContent;
-    });
-  </script>
+    }
+  }
+}`;
+---
+
+<BaseLayout
+  title="YAML to JSON Converter - Free Online YAML to JSON Tool"
+  description="Convert YAML to JSON instantly in your browser. Free online converter, zero server upload. Supports nested objects, arrays, anchors, and aliases."
+>
+  <Header />
+
+  <main>
+    <section class="container-tool pt-16 md:pt-20 pb-6 text-center">
+      <nav class="flex items-center justify-center gap-2 text-sm text-zinc-400 mb-6">
+        <a href="/" class="text-zinc-500 hover:text-zinc-900">Home</a>
+        <span>/</span>
+        <span class="text-zinc-700">YAML to JSON Converter</span>
+      </nav>
+      <h1 class="display">YAML to JSON</h1>
+      <p class="lead mt-6 max-w-2xl mx-auto">
+        Convert YAML to JSON instantly in your browser. No upload, no server —
+        the conversion runs entirely on your device.
+      </p>
+      <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-zinc-200 bg-zinc-50 text-sm text-zinc-600 mt-6">
+        <svg class="w-4 h-4 text-blue-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Your data never leaves your browser.
+      </span>
+    </section>
+
+    <ToolPanel client:idle initialTab="to-json" />
+
+    <section class="container-tool section">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <p class="eyebrow">Side by side</p>
+        <h2 class="h-section mt-3">YAML vs JSON</h2>
+        <p class="lead mt-4">The same structure in both formats. YAML favors indentation and minimal punctuation; JSON uses braces, brackets, and quotes.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <figure class="tool-card">
+          <figcaption class="px-4 py-2.5 border-b border-zinc-200 bg-zinc-50 text-sm font-medium text-zinc-700">YAML input</figcaption>
+          <pre class="p-5 text-[13px] leading-relaxed overflow-x-auto" set:html={cmpYaml}></pre>
+        </figure>
+        <figure class="tool-card">
+          <figcaption class="px-4 py-2.5 border-b border-zinc-200 bg-zinc-50 text-sm font-medium text-zinc-700">JSON output</figcaption>
+          <pre class="p-5 text-[13px] leading-relaxed overflow-x-auto" set:html={cmpJson}></pre>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section band-soft">
+      <div class="container-tool">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+          <p class="eyebrow">Why this converter</p>
+          <h2 class="h-section mt-3">Built for real conversion work</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div class="p-6 rounded-2xl border border-zinc-200 bg-white">
+            <h3 class="h-sub">Lossless, YAML 1.2</h3>
+            <p class="mt-2 text-zinc-500 leading-relaxed">Conversion follows the YAML 1.2 spec with correct boolean, null, and numeric handling — nothing gets re-interpreted along the way.</p>
+          </div>
+          <div class="p-6 rounded-2xl border border-zinc-200 bg-white">
+            <h3 class="h-sub">Anchors resolved</h3>
+            <p class="mt-2 text-zinc-500 leading-relaxed">Anchors (&amp;) and aliases (*) are expanded into their real values. Merge keys (&lt;&lt;) are handled too, so the JSON contains concrete data.</p>
+          </div>
+          <div class="p-6 rounded-2xl border border-zinc-200 bg-white">
+            <h3 class="h-sub">Multi-document</h3>
+            <p class="mt-2 text-zinc-500 leading-relaxed">YAML files with multiple documents separated by <code class="text-xs px-1.5 py-0.5 rounded bg-zinc-100">---</code> are converted independently and kept intact.</p>
+          </div>
+          <div class="p-6 rounded-2xl border border-zinc-200 bg-white">
+            <h3 class="h-sub">Pinpoint errors</h3>
+            <p class="mt-2 text-zinc-500 leading-relaxed">Syntax problems are reported with the exact line and column, plus a plain-language hint on how to fix them.</p>
+          </div>
+          <div class="p-6 rounded-2xl border border-zinc-200 bg-white">
+            <h3 class="h-sub">Drag &amp; drop</h3>
+            <p class="mt-2 text-zinc-500 leading-relaxed">Drop a <code class="text-xs px-1.5 py-0.5 rounded bg-zinc-100">.yaml</code> or <code class="text-xs px-1.5 py-0.5 rounded bg-zinc-100">.yml</code> file straight into the editor and get JSON back instantly.</p>
+          </div>
+          <div class="p-6 rounded-2xl border border-zinc-200 bg-white">
+            <h3 class="h-sub">Private by default</h3>
+            <p class="mt-2 text-zinc-500 leading-relaxed">Everything runs client-side. There is no backend, so there is nowhere for your data to go — it works even offline.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container-tool section">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <p class="eyebrow">Use cases</p>
+        <h2 class="h-section mt-3">Why convert YAML to JSON?</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-4xl mx-auto">
+        <div class="p-6 rounded-2xl border border-zinc-200 bg-white">
+          <h3 class="h-sub">REST API payloads</h3>
+          <p class="mt-2 text-zinc-500 leading-relaxed">Write request bodies in readable YAML, then convert to JSON for <code class="text-xs px-1.5 py-0.5 rounded bg-zinc-100">curl</code>, Postman, or any HTTP client.</p>
+        </div>
+        <div class="p-6 rounded-2xl border border-zinc-200 bg-white">
+          <h3 class="h-sub">Node.js and browsers</h3>
+          <p class="mt-2 text-zinc-500 leading-relaxed">JSON parses natively with <code class="text-xs px-1.5 py-0.5 rounded bg-zinc-100">JSON.parse()</code>. Convert YAML configs for zero-dependency loading.</p>
+        </div>
+        <div class="p-6 rounded-2xl border border-zinc-200 bg-white">
+          <h3 class="h-sub">NoSQL imports</h3>
+          <p class="mt-2 text-zinc-500 leading-relaxed">MongoDB, CouchDB, and Elasticsearch consume JSON documents. Turn YAML fixtures into ready-to-import data.</p>
+        </div>
+        <div class="p-6 rounded-2xl border border-zinc-200 bg-white">
+          <h3 class="h-sub">Infrastructure as code</h3>
+          <p class="mt-2 text-zinc-500 leading-relaxed">Tools that only accept JSON — CloudFormation, some Terraform paths — can consume your YAML configs after conversion.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section band-soft">
+      <div class="container-tool max-w-4xl">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+          <p class="eyebrow">Type mapping</p>
+          <h2 class="h-section mt-3">YAML to JSON data types</h2>
+        </div>
+        <div class="overflow-x-auto tool-card">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-zinc-50 text-left text-zinc-500">
+                <th class="px-4 py-3 font-semibold">YAML type</th>
+                <th class="px-4 py-3 font-semibold">YAML example</th>
+                <th class="px-4 py-3 font-semibold">JSON type</th>
+                <th class="px-4 py-3 font-semibold">JSON result</th>
+              </tr>
+            </thead>
+            <tbody class="font-mono text-[13px]">
+              <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">String</td><td>hello</td><td class="font-sans text-zinc-700">String</td><td>"hello"</td></tr>
+              <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Integer</td><td>42</td><td class="font-sans text-zinc-700">Number</td><td>42</td></tr>
+              <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Float</td><td>3.14</td><td class="font-sans text-zinc-700">Number</td><td>3.14</td></tr>
+              <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Boolean</td><td>true</td><td class="font-sans text-zinc-700">Boolean</td><td>true</td></tr>
+              <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Null</td><td>null / ~</td><td class="font-sans text-zinc-700">Null</td><td>null</td></tr>
+              <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Date</td><td>2025-01-15</td><td class="font-sans text-zinc-700">String</td><td>"2025-01-15"</td></tr>
+              <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Sequence</td><td>- a<br>- b</td><td class="font-sans text-zinc-700">Array</td><td>["a", "b"]</td></tr>
+              <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Mapping</td><td>key: val</td><td class="font-sans text-zinc-700">Object</td><td>{'{'}"key": "val"{'}'}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="container-tool section">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <p class="eyebrow">Real-world examples</p>
+        <h2 class="h-section mt-3">DevOps configs, converted</h2>
+        <p class="lead mt-4">Common configuration files, before and after conversion.</p>
+      </div>
+      <div class="space-y-10">
+        <div>
+          <h3 class="h-sub mb-4">Kubernetes Deployment</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <figure class="tool-card">
+              <figcaption class="px-4 py-2.5 border-b border-zinc-200 bg-zinc-50 text-sm font-medium text-zinc-700">YAML</figcaption>
+              <pre class="p-5 text-[13px] leading-relaxed overflow-x-auto" set:html={k8sYaml}></pre>
+            </figure>
+            <figure class="tool-card">
+              <figcaption class="px-4 py-2.5 border-b border-zinc-200 bg-zinc-50 text-sm font-medium text-zinc-700">JSON</figcaption>
+              <pre class="p-5 text-[13px] leading-relaxed overflow-x-auto" set:html={k8sJson}></pre>
+            </figure>
+          </div>
+        </div>
+        <div>
+          <h3 class="h-sub mb-4">Docker Compose</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <figure class="tool-card">
+              <figcaption class="px-4 py-2.5 border-b border-zinc-200 bg-zinc-50 text-sm font-medium text-zinc-700">YAML</figcaption>
+              <pre class="p-5 text-[13px] leading-relaxed overflow-x-auto" set:html={dockerYaml}></pre>
+            </figure>
+            <figure class="tool-card">
+              <figcaption class="px-4 py-2.5 border-b border-zinc-200 bg-zinc-50 text-sm font-medium text-zinc-700">JSON</figcaption>
+              <pre class="p-5 text-[13px] leading-relaxed overflow-x-auto" set:html={dockerJson}></pre>
+            </figure>
+          </div>
+        </div>
+        <div>
+          <h3 class="h-sub mb-4">GitHub Actions workflow</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <figure class="tool-card">
+              <figcaption class="px-4 py-2.5 border-b border-zinc-200 bg-zinc-50 text-sm font-medium text-zinc-700">YAML</figcaption>
+              <pre class="p-5 text-[13px] leading-relaxed overflow-x-auto" set:html={ciYaml}></pre>
+            </figure>
+            <figure class="tool-card">
+              <figcaption class="px-4 py-2.5 border-b border-zinc-200 bg-zinc-50 text-sm font-medium text-zinc-700">JSON</figcaption>
+              <pre class="p-5 text-[13px] leading-relaxed overflow-x-auto" set:html={ciJson}></pre>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section band-soft">
+      <div class="container-tool max-w-3xl">
+        <h2 class="h-section text-center mb-10">Frequently asked questions</h2>
+        <dl class="space-y-3">
+          <div class="border border-zinc-200 rounded-xl overflow-hidden bg-white">
+            <dt><button type="button" class="faq-toggle flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-medium text-zinc-900 hover:bg-zinc-50" aria-expanded="false"><span>Is the conversion accurate?</span><svg class="faq-chevron w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button></dt>
+            <dd class="faq-answer hidden px-5 pb-4 text-sm text-zinc-600 leading-relaxed">Yes. The <code class="text-xs">yaml</code> library follows the YAML 1.2 specification, so data types, nesting, and values are preserved exactly — the conversion is lossless.</dd>
+          </div>
+          <div class="border border-zinc-200 rounded-xl overflow-hidden bg-white">
+            <dt><button type="button" class="faq-toggle flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-medium text-zinc-900 hover:bg-zinc-50" aria-expanded="false"><span>Does this tool send my data anywhere?</span><svg class="faq-chevron w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button></dt>
+            <dd class="faq-answer hidden px-5 pb-4 text-sm text-zinc-600 leading-relaxed">No. Everything runs in your browser with client-side JavaScript. Disconnect from the internet after loading and conversion still works.</dd>
+          </div>
+          <div class="border border-zinc-200 rounded-xl overflow-hidden bg-white">
+            <dt><button type="button" class="faq-toggle flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-medium text-zinc-900 hover:bg-zinc-50" aria-expanded="false"><span>What happens to anchors and comments?</span><svg class="faq-chevron w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button></dt>
+            <dd class="faq-answer hidden px-5 pb-4 text-sm text-zinc-600 leading-relaxed">Anchors and aliases are resolved into their real values. Comments are dropped — JSON has no comment syntax, so the output stays valid.</dd>
+          </div>
+          <div class="border border-zinc-200 rounded-xl overflow-hidden bg-white">
+            <dt><button type="button" class="faq-toggle flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-medium text-zinc-900 hover:bg-zinc-50" aria-expanded="false"><span>Can I convert large files?</span><svg class="faq-chevron w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button></dt>
+            <dd class="faq-answer hidden px-5 pb-4 text-sm text-zinc-600 leading-relaxed">Yes — thousands of lines convert in moments, entirely client-side. Drag and drop <code class="text-xs">.yaml</code> / <code class="text-xs">.yml</code> files straight into the editor.</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="container-tool section">
+      <h2 class="h-section text-center mb-10">Related tools</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-4xl mx-auto">
+        <a href="/" class="p-6 rounded-2xl border border-zinc-200 bg-white no-underline block hover:bg-zinc-50">
+          <h3 class="h-sub">YAML Formatter</h3>
+          <p class="mt-2 text-sm text-zinc-500">Format and validate YAML with consistent indentation.</p>
+        </a>
+        <a href="/json-to-yaml" class="p-6 rounded-2xl border border-zinc-200 bg-white no-underline block hover:bg-zinc-50">
+          <h3 class="h-sub">JSON to YAML</h3>
+          <p class="mt-2 text-sm text-zinc-500">Convert JSON back to clean, readable YAML.</p>
+        </a>
+        <a href="/case-converter" class="p-6 rounded-2xl border border-zinc-200 bg-white no-underline block hover:bg-zinc-50">
+          <h3 class="h-sub">Case Converter</h3>
+          <p class="mt-2 text-sm text-zinc-500">Shift text between seven case styles instantly.</p>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
 
   <script>
-    document.querySelectorAll(".faq-toggle").forEach(e => {
+    document.querySelectorAll(".faq-toggle").forEach((e) => {
       e.addEventListener("click", () => {
         const answer = e.closest("div")?.querySelector(".faq-answer");
         const chevron = e.querySelector(".faq-chevron");

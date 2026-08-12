@@ -1,31 +1,29 @@
 ---
 ---
-
-<section id="features" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-  <div class="text-center mb-12">
-    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-      Everything You Need for YAML
-    </h2>
-    <p class="mt-3 text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto">
-      A complete toolset for YAML developers, running entirely in your browser.
-    </p>
-  </div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-    {[
-      { icon: 'M4 6h16M4 12h16M4 18h16', title: 'Instant Formatting', desc: 'Beautify messy YAML with perfect indentation in milliseconds. Handles deeply nested structures.' },
-      { icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', title: 'Syntax Validation', desc: 'Catch errors with precise line and column highlighting. Understand what went wrong instantly.' },
-      { icon: 'M14.5 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14.5 2z', title: 'File Upload & Drag', desc: 'Drag and drop .yaml or .yml files directly into the editor. No upload, local only.' },
-      { icon: 'M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4', title: 'YAML to JSON', desc: 'Convert YAML to JSON with one click. Lossless, handles complex nested structures.' },
-      { icon: 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z', title: 'Dark & Light Mode', desc: 'Auto-detects your system theme. Crisp syntax highlighting in both modes.' },
-      { icon: 'M13 10V3L4 14h7v7l9-11h-7z', title: 'Real-time Feedback', desc: 'See formatted output update as you type. Zero latency, instant visual feedback.' },
-    ].map(({icon, title, desc}) => (
-      <div class="group relative p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 hover:border-emerald-200 dark:hover:border-emerald-700 hover:shadow-sm transition-all duration-200">
-        <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200">
-          <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d={icon}/></svg>
+<section id="features" class="section">
+  <div class="container-tool">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <p class="eyebrow">Everything you need</p>
+      <h2 class="h-section mt-3">A complete YAML toolset</h2>
+      <p class="lead mt-4">Format, validate, and convert — all in your browser.</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {[
+        { icon: 'M4 6h16M4 12h16M4 18h16', title: 'Instant Formatting', desc: 'Beautify messy YAML with perfect indentation in milliseconds. Handles deeply nested structures.' },
+        { icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', title: 'Syntax Validation', desc: 'Catch errors with precise line and column highlighting. Understand what went wrong instantly.' },
+        { icon: 'M14.5 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14.5 2z', title: 'File Upload & Drag', desc: 'Drag and drop .yaml or .yml files directly into the editor. No upload, local only.' },
+        { icon: 'M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4', title: 'YAML to JSON', desc: 'Convert YAML to JSON with one click. Lossless, handles complex nested structures.' },
+        { icon: 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z', title: 'Real-time Feedback', desc: 'See formatted output update as you type. Zero latency, instant visual feedback.' },
+        { icon: 'M13 10V3L4 14h7v7l9-11h-7z', title: 'Multi-document', desc: 'Processes every --- separated document in a file independently.' },
+      ].map(({ icon, title, desc }) => (
+        <div class="p-6 rounded-2xl border border-zinc-200 bg-white">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d={icon}/></svg>
+          </div>
+          <h3 class="h-sub">{title}</h3>
+          <p class="mt-1.5 text-sm text-zinc-500 leading-relaxed">{desc}</p>
         </div>
-        <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
-        <p class="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">{desc}</p>
-      </div>
-    ))}
+      ))}
+    </div>
   </div>
 </section>

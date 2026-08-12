@@ -3,3 +3,4 @@ dist/
 .astro/
 public/images/
 .qoder/
+*.log
