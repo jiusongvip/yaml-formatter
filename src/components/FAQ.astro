@@ -7,10 +7,17 @@
       {[
         { q: 'Is my YAML data safe? Does it get uploaded?', a: 'No. Everything runs entirely in your browser using client-side JavaScript. Your data is never transmitted to any server — disconnect from the internet after loading and it keeps working.' },
         { q: 'Can I convert YAML to JSON with this tool?', a: 'Yes. Click the YAML to JSON tab above the editor to convert your document to formatted JSON. Nested objects, arrays, and complex structures convert without data loss.' },
+        { q: 'How do I convert JSON back to YAML?', a: 'Switch to the JSON to YAML tab, paste your JSON, and get clean block-style YAML instantly. Strings that could be misread — like "yes" or "8080" — are quoted automatically so values round-trip exactly.' },
+        { q: 'Is the conversion accurate?', a: 'Yes. The parser follows the YAML 1.2 specification, so data types, nesting, and values are preserved exactly — the conversion is lossless.' },
         { q: 'Does it support YAML anchors and aliases?', a: 'Yes. The parser fully supports YAML 1.2 anchors (&), aliases (*), and merge keys (<<). Both the references and the resolved values are preserved in the output.' },
+        { q: 'What happens to YAML comments during conversion?', a: 'Comments are dropped when converting to JSON, because JSON has no comment syntax. When formatting YAML without converting, comments are preserved in place.' },
+        { q: 'How are YAML data types mapped to JSON?', a: 'Strings, numbers, booleans, and null map directly. YAML sequences become JSON arrays, mappings become objects, and dates become ISO 8601 strings. See the type mapping table above.' },
+        { q: 'Why do some strings come out quoted?', a: 'Values that look like booleans in older YAML dialects — yes, no, on, off — or that read as numbers are quoted so the YAML parses back to the original string. It keeps round-trips exact.' },
         { q: 'Can I format multiple YAML documents at once?', a: 'Yes. Files with multiple documents separated by --- are processed independently, and the separators are preserved — useful for multi-resource Kubernetes manifests.' },
-        { q: 'Does it preserve comments?', a: 'Yes. Comments keep their position relative to the surrounding keys and values during formatting.' },
+        { q: 'Does it preserve comments when formatting?', a: 'Yes. Comments keep their position relative to the surrounding keys and values during formatting.' },
+        { q: 'Can I convert large files?', a: 'Yes — thousands of lines convert in moments, entirely client-side. Drag and drop .yaml, .yml, or .json files straight into the editor.' },
         { q: 'Is this YAML formatter free?', a: 'Yes, completely free with no limits. No sign-up, no usage caps. The project is open source and will stay free.' },
+        { q: 'Can I use this tool offline?', a: 'Yes. Once the page is loaded, all processing happens locally in your browser. Disconnect from the internet and the formatter continues to work.' },
       ].map(({ q, a }) => (
         <div class="border border-zinc-200 rounded-xl overflow-hidden bg-white">
           <dt>

@@ -1,11 +1,10 @@
 ---
 const pathname = Astro.url.pathname;
 const links = [
-  { href: '/', label: 'Formatter' },
-  { href: '/yaml-to-json', label: 'YAML to JSON' },
-  { href: '/json-to-yaml', label: 'JSON to YAML' },
-  { href: '/case-converter', label: 'Case Converter' },
-  { href: '/blog', label: 'Blog' },
+  { href: '/#formatter', label: 'Formatter' },
+  { href: '/#yaml-to-json', label: 'YAML to JSON' },
+  { href: '/#json-to-yaml', label: 'JSON to YAML' },
+  { href: '/#guides', label: 'Guides' },
 ];
 const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
 ---

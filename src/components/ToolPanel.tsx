@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { formatYAML, yamlToJSON, jsonToYAML, countDocuments, computeDiff, expandAnchors, validateSchema } from "../lib/yaml";
 import type { DiffChange, SchemaValidationResult } from "../lib/yaml";
-import { EditorView, keymap, lineNumbers, highlightActiveLine, Decoration } from "@codemirror/view";
+import { EditorView, keymap, lineNumbers, highlightActiveLine, Decoration, type DecorationSet } from "@codemirror/view";
 import { yaml as yamlLang } from "@codemirror/lang-yaml";
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { syntaxHighlighting, defaultHighlightStyle } from "@codemirror/language";
@@ -502,6 +502,19 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
       });
     }
   }, [error, tab]);
+
+  // Load tab from URL hash on mount (e.g. /#yaml-to-json, /#json-to-yaml, /#diff)
+  useEffect(() => {
+    const hash = window.location.hash;
+    const tabMap: Record<string, TabType> = {
+      "#yaml-to-json": "to-json",
+      "#json-to-yaml": "json-to-yaml",
+      "#diff": "diff",
+      "#format": "format",
+    };
+    const target = tabMap[hash];
+    if (target) setTab(target);
+  }, []);
 
   // Load shared YAML from URL hash on mount
   useEffect(() => {

@@ -6,7 +6,10 @@ import ToolPanel from '../components/ToolPanel';
 import Features from '../components/Features.astro';
 import HowItWorks from '../components/HowItWorks.astro';
 import UseCases from '../components/UseCases.astro';
+import TypeMapping from '../components/TypeMapping.astro';
+import Examples from '../components/Examples.astro';
 import RelatedTools from '../components/RelatedTools.astro';
+import Guides from '../components/Guides.astro';
 import FAQ from '../components/FAQ.astro';
 import Footer from '../components/Footer.astro';
 
@@ -28,8 +31,15 @@ const jsonLd = {
       mainEntity: [
         { '@type': 'Question', name: 'Is my YAML data safe? Does it get uploaded?', acceptedAnswer: { '@type': 'Answer', text: 'No. Everything runs entirely in your browser using client-side JavaScript. Your YAML data is never transmitted to any server. You can verify this by disconnecting your internet after loading the page and the formatter will continue to work.' } },
         { '@type': 'Question', name: 'Can I convert YAML to JSON with this tool?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Click the YAML to JSON tab above the editor to instantly convert your YAML document to properly formatted JSON. The conversion handles nested objects, arrays, and complex data structures without data loss.' } },
+        { '@type': 'Question', name: 'How do I convert JSON back to YAML?', acceptedAnswer: { '@type': 'Answer', text: 'Switch to the JSON to YAML tab, paste your JSON, and get clean block-style YAML instantly. Strings that could be misread are quoted automatically so values round-trip exactly.' } },
+        { '@type': 'Question', name: 'Is the conversion accurate?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. The parser follows the YAML 1.2 specification, so data types, nesting, and values are preserved exactly — the conversion is lossless.' } },
         { '@type': 'Question', name: 'Does it support YAML anchors and aliases?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. The parser fully supports YAML 1.2 anchors (&), aliases (*), and merge keys (<<). Both the anchor references and the resolved values are preserved in the formatted output.' } },
+        { '@type': 'Question', name: 'What happens to YAML comments during conversion?', acceptedAnswer: { '@type': 'Answer', text: 'Comments are dropped when converting to JSON because JSON has no comment syntax. When formatting YAML without converting, comments are preserved in place.' } },
+        { '@type': 'Question', name: 'How are YAML data types mapped to JSON?', acceptedAnswer: { '@type': 'Answer', text: 'Strings, numbers, booleans, and null map directly. YAML sequences become JSON arrays, mappings become objects, and dates become ISO 8601 strings.' } },
+        { '@type': 'Question', name: 'Why do some strings come out quoted?', acceptedAnswer: { '@type': 'Answer', text: 'Values that look like booleans in older YAML dialects — yes, no, on, off — or that read as numbers are quoted so the YAML parses back to the original string.' } },
         { '@type': 'Question', name: 'Can I format multiple YAML documents at once?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. YAML files can contain multiple documents separated by ---. Our formatter processes each document independently and preserves the document separators.' } },
+        { '@type': 'Question', name: 'Does it preserve comments when formatting?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Comments keep their position relative to the surrounding keys and values during formatting.' } },
+        { '@type': 'Question', name: 'Can I convert large files?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Thousands of lines convert in moments, entirely client-side. Drag and drop .yaml, .yml, or .json files straight into the editor.' } },
         { '@type': 'Question', name: 'Is this YAML formatter free?', acceptedAnswer: { '@type': 'Answer', text: 'Yes, completely free with no limits. No sign-up required, no usage caps, no premium tiers. The project is open source and will always remain free.' } },
         { '@type': 'Question', name: 'Can I use this tool offline?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Once the page is loaded, all processing happens locally in your browser. Disconnect from the internet and the formatter continues to work.' } },
       ],
@@ -56,8 +66,11 @@ const jsonLd = {
     <Features />
     <HowItWorks />
     <UseCases />
-    <RelatedTools />
+    <TypeMapping />
+    <Examples />
     <FAQ />
+    <RelatedTools />
+    <Guides />
   </main>
   <Footer />
 

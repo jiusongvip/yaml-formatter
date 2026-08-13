@@ -1,0 +1,37 @@
+---
+---
+
+<section id="type-mapping" class="section band-soft">
+  <div class="container-tool max-w-4xl">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <p class="eyebrow">Type mapping</p>
+      <h2 class="h-section mt-3">YAML to JSON data types</h2>
+      <p class="lead mt-4">Every YAML value maps to a JSON equivalent. Here is the complete reference, in both directions.</p>
+    </div>
+    <div class="overflow-x-auto tool-card">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-zinc-50 text-left text-zinc-500">
+            <th class="px-4 py-3 font-semibold">YAML type</th>
+            <th class="px-4 py-3 font-semibold">YAML example</th>
+            <th class="px-4 py-3 font-semibold">JSON type</th>
+            <th class="px-4 py-3 font-semibold">JSON result</th>
+          </tr>
+        </thead>
+        <tbody class="font-mono text-[13px]">
+          <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">String</td><td>hello</td><td class="font-sans text-zinc-700">String</td><td>"hello"</td></tr>
+          <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Integer</td><td>42</td><td class="font-sans text-zinc-700">Number</td><td>42</td></tr>
+          <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Float</td><td>3.14</td><td class="font-sans text-zinc-700">Number</td><td>3.14</td></tr>
+          <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Boolean</td><td>true</td><td class="font-sans text-zinc-700">Boolean</td><td>true</td></tr>
+          <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Null</td><td>null / ~</td><td class="font-sans text-zinc-700">Null</td><td>null</td></tr>
+          <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Date</td><td>2025-01-15</td><td class="font-sans text-zinc-700">String</td><td>"2025-01-15"</td></tr>
+          <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Sequence</td><td>- a<br>- b</td><td class="font-sans text-zinc-700">Array</td><td>["a", "b"]</td></tr>
+          <tr class="border-t border-zinc-100"><td class="px-4 py-2.5 font-sans text-zinc-700">Mapping</td><td>key: val</td><td class="font-sans text-zinc-700">Object</td><td>{'{'}"key": "val"{'}'}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="mt-4 text-sm text-zinc-500 text-center">
+      Conversion follows the YAML 1.2 spec — strings that look like <code class="text-xs px-1.5 py-0.5 rounded bg-zinc-100">yes</code>, <code class="text-xs px-1.5 py-0.5 rounded bg-zinc-100">on</code>, or numbers are quoted automatically so values round-trip exactly.
+    </p>
+  </div>
+</section>

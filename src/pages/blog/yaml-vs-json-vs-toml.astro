@@ -149,7 +149,7 @@ pool_size = 10</code></pre>
   <p>Sometimes you need to convert configuration from one format to another. Here are common migration scenarios:</p>
 
   <h3>JSON to YAML</h3>
-  <p>Common when moving from programmatic configs to human-readable ones. Remove all brackets, replace commas with newlines, add indentation-based nesting. Our <a href="/json-to-yaml">JSON to YAML converter</a> handles this instantly.</p>
+  <p>Common when moving from programmatic configs to human-readable ones. Remove all brackets, replace commas with newlines, add indentation-based nesting. Our <a href="/#json-to-yaml">JSON to YAML converter</a> handles this instantly.</p>
   <pre><code>// JSON input
 &#123;"server": &#123;"host": "localhost", "port": 8080&#125;&#125;
 
@@ -159,7 +159,7 @@ server:
   port: 8080</code></pre>
 
   <h3>YAML to JSON</h3>
-  <p>Needed when feeding YAML configs into systems that only accept JSON (like many APIs). Add brackets, commas, and quotes. Our <a href="/yaml-to-json">YAML to JSON converter</a> does this in one click.</p>
+  <p>Needed when feeding YAML configs into systems that only accept JSON (like many APIs). Add brackets, commas, and quotes. Our <a href="/#yaml-to-json">YAML to JSON converter</a> does this in one click.</p>
 
   <h3>TOML to YAML</h3>
   <p>Less common but sometimes needed when moving from a TOML-based project to a YAML-based CI/CD pipeline. Convert sections to nested mappings. No automated tool is as reliable as for JSON/YAML conversion, but our formatter can validate the result.</p>

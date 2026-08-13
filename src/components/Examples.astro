@@ -1,0 +1,173 @@
+---
+const examples = [
+  {
+    title: 'Kubernetes Deployment',
+    yaml: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25
+        ports:
+        - containerPort: 80`,
+    json: `{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "nginx-deployment",
+    "labels": { "app": "nginx" }
+  },
+  "spec": {
+    "replicas": 3,
+    "selector": {
+      "matchLabels": { "app": "nginx" }
+    },
+    "template": {
+      "metadata": {
+        "labels": { "app": "nginx" }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "nginx",
+            "image": "nginx:1.25",
+            "ports": [{ "containerPort": 80 }]
+          }
+        ]
+      }
+    }
+  }
+}`,
+  },
+  {
+    title: 'Docker Compose',
+    yaml: `version: "3.8"
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - db
+      - redis
+  db:
+    image: postgres:15
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: myapp
+  redis:
+    image: redis:7-alpine
+volumes:
+  pgdata:`,
+    json: `{
+  "version": "3.8",
+  "services": {
+    "web": {
+      "build": ".",
+      "ports": ["3000:3000"],
+      "environment": { "NODE_ENV": "production" },
+      "depends_on": ["db", "redis"]
+    },
+    "db": {
+      "image": "postgres:15",
+      "volumes": ["pgdata:/var/lib/postgresql/data"],
+      "environment": { "POSTGRES_DB": "myapp" }
+    },
+    "redis": {
+      "image": "redis:7-alpine"
+    }
+  },
+  "volumes": { "pgdata": null }
+}`,
+  },
+  {
+    title: 'GitHub Actions workflow',
+    yaml: `name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm test`,
+    json: `{
+  "name": "CI",
+  "on": {
+    "push": { "branches": ["main"] },
+    "pull_request": { "branches": ["main"] }
+  },
+  "jobs": {
+    "test": {
+      "runs-on": "ubuntu-latest",
+      "strategy": {
+        "matrix": { "node-version": [18, 20] }
+      },
+      "steps": [
+        { "uses": "actions/checkout@v4" },
+        {
+          "name": "Use Node.js",
+          "uses": "actions/setup-node@v4",
+          "with": { "node-version": 20 }
+        },
+        { "run": "npm ci" },
+        { "run": "npm test" }
+      ]
+    }
+  }
+}`,
+  },
+];
+---
+
+<section id="examples" class="container-tool section">
+  <div class="text-center max-w-2xl mx-auto mb-10">
+    <p class="eyebrow">Real-world examples</p>
+    <h2 class="h-section mt-3">DevOps configs, converted</h2>
+    <p class="lead mt-4">Common configuration files, before and after conversion.</p>
+  </div>
+  <div class="space-y-10">
+    {examples.map((ex) => (
+      <div>
+        <h3 class="h-sub mb-4">{ex.title}</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <figure class="tool-card">
+            <figcaption class="px-4 py-2.5 border-b border-zinc-200 bg-zinc-50 text-sm font-medium text-zinc-700">YAML</figcaption>
+            <pre class="p-5 text-[13px] leading-relaxed overflow-x-auto">{ex.yaml}</pre>
+          </figure>
+          <figure class="tool-card">
+            <figcaption class="px-4 py-2.5 border-b border-zinc-200 bg-zinc-50 text-sm font-medium text-zinc-700">JSON</figcaption>
+            <pre class="p-5 text-[13px] leading-relaxed overflow-x-auto">{ex.json}</pre>
+          </figure>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

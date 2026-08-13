@@ -8,12 +8,8 @@
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
       {[
-        { title: 'YAML to JSON Converter', desc: 'Convert YAML configuration to JSON for API consumption.', href: '/yaml-to-json' },
-        { title: 'JSON to YAML Converter', desc: 'Turn JSON structures into clean, readable YAML.', href: '/json-to-yaml' },
-        { title: 'Case Converter', desc: 'Shift text between seven case styles instantly.', href: '/case-converter' },
-        { title: 'YAML Syntax Guide', desc: 'Learn YAML syntax, best practices, and common pitfalls.', href: '/blog/yaml-syntax-guide' },
-        { title: 'Common YAML Errors', desc: 'Spot and fix the most frequent YAML mistakes.', href: '/blog/yaml-common-errors' },
-        { title: 'YAML vs JSON vs TOML', desc: 'Which serialization format should you use?', href: '/blog/yaml-vs-json-vs-toml' },
+        { title: 'YAML to JSON Converter', desc: 'Convert YAML configuration to JSON for API consumption.', href: '/#yaml-to-json' },
+        { title: 'JSON to YAML Converter', desc: 'Turn JSON structures into clean, readable YAML.', href: '/#json-to-yaml' },
       ].map(({ title, desc, href }) => (
         <a href={href} class="block p-5 rounded-2xl border border-zinc-200 bg-white no-underline hover:bg-zinc-50">
           <h3 class="h-sub text-sm">{title}</h3>
