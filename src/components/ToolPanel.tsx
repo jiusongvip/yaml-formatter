@@ -651,8 +651,11 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
             <button onClick={() => handleTabChange("json-to-yaml")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors border-r border-zinc-200 ${tab === "json-to-yaml" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
               JSON to YAML
             </button>
-            <button onClick={() => handleTabChange("diff")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors ${tab === "diff" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
+            <button onClick={() => handleTabChange("diff")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors border-r border-zinc-200 ${tab === "diff" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
               Diff
+            </button>
+            <button onClick={() => handleTabChange("schema")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors ${tab === "schema" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
+              Schema
             </button>
           </div>
 
