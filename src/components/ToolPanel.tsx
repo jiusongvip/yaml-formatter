@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { formatYAML, yamlToJSON, jsonToYAML, countDocuments, computeDiff, expandAnchors, validateSchema } from "../lib/yaml";
+import { parse } from "yaml";
 import type { DiffChange, SchemaValidationResult } from "../lib/yaml";
 import { EditorView, keymap, lineNumbers, highlightActiveLine, Decoration, type DecorationSet } from "@codemirror/view";
 import { yaml as yamlLang } from "@codemirror/lang-yaml";
@@ -216,7 +217,60 @@ const DEFAULT_JSON_INPUT = `{
   }
 }`;
 
-type TabType = "format" | "to-json" | "json-to-yaml" | "diff" | "schema";
+type TabType = "format" | "to-json" | "json-to-yaml" | "diff" | "schema" | "tree";
+
+// Recursive tree view node (uses native <details> for folding)
+function TreeLeaf({ name, value, type }: { name: string | null; value: string; type: string }) {
+  const color =
+    type === "number" ? "text-amber-600"
+    : type === "boolean" ? "text-purple-600"
+    : type === "null" ? "text-zinc-400 italic"
+    : "text-zinc-700";
+  return (
+    <div className="flex items-baseline gap-2 py-0.5">
+      {name !== null && <span className="text-blue-600 font-medium shrink-0">{name}:</span>}
+      <span className={`font-mono text-[13px] break-all ${color}`}>{value}</span>
+    </div>
+  );
+}
+
+function TreeNode({ name, value, depth }: { name: string | null; value: unknown; depth: number }) {
+  if (value === null || value === undefined) {
+    return <TreeLeaf name={name} value="null" type="null" />;
+  }
+  if (Array.isArray(value)) {
+    return (
+      <details open={depth < 2} className="group">
+        <summary className="cursor-pointer select-none hover:bg-zinc-50 rounded px-1 -ml-1 flex items-center gap-1.5">
+          <span className="text-blue-600 font-medium">{name ?? "array"}</span>
+          <span className="text-zinc-400 text-xs">[{value.length}]</span>
+        </summary>
+        <div className="ml-3 pl-3 border-l border-zinc-200">
+          {value.map((item, i) => (
+            <TreeNode key={i} name={String(i)} value={item} depth={depth + 1} />
+          ))}
+        </div>
+      </details>
+    );
+  }
+  if (typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>);
+    return (
+      <details open={depth < 2} className="group">
+        <summary className="cursor-pointer select-none hover:bg-zinc-50 rounded px-1 -ml-1 flex items-center gap-1.5">
+          <span className="text-blue-600 font-medium">{name ?? "object"}</span>
+          <span className="text-zinc-400 text-xs">{"{"}{entries.length}{"}"}</span>
+        </summary>
+        <div className="ml-3 pl-3 border-l border-zinc-200">
+          {entries.map(([k, v]) => (
+            <TreeNode key={k} name={k} value={v} depth={depth + 1} />
+          ))}
+        </div>
+      </details>
+    );
+  }
+  return <TreeLeaf name={name} value={String(value)} type={typeof value} />;
+}
 
 // Error line highlight effect
 const errorLineEffect = StateEffect.define<{ line: number | null }>();
@@ -324,6 +378,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
   const [copied, setCopied] = useState(false);
   const [indent, setIndent] = useState(2);
   const [sortKeys, setSortKeys] = useState(false);
+  const [quoteStyle, setQuoteStyle] = useState<"double" | "single" | "plain">("plain");
   const [autoFormat, setAutoFormat] = useState(true);
   const [docCount, setDocCount] = useState(0);
   const [diffChanges, setDiffChanges] = useState<DiffChange[]>([]);
@@ -337,6 +392,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
   const [schemaInput, setSchemaInput] = useState("");
   const [schemaResult, setSchemaResult] = useState<SchemaValidationResult | null>(null);
   const [schemaValidating, setSchemaValidating] = useState(false);
+  const [treeData, setTreeData] = useState<unknown>(null);
   const [history, setHistory] = useState<Array<{ input: string; output: string; tab: TabType; ts: number }>>([]);
 
   const inputRef = useRef<HTMLDivElement>(null);
@@ -357,6 +413,21 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
       }
       // Schema validation is handled by its own async effect (lazy-loads Ajv).
       if (tab === "schema") return;
+      if (tab === "tree") {
+        try {
+          setTreeData(parse(value));
+          setError(null);
+          setFormatTime(null);
+          setDocCount(0);
+          setDiffChanges([]);
+        } catch (e: unknown) {
+          const err = e as { message: string };
+          setTreeData(null);
+          setError({ line: 1, col: 1, message: err.message || "Invalid YAML" });
+          setFormatTime(null);
+        }
+        return;
+      }
       const t0 = performance.now();
       if (tab === "json-to-yaml") {
         const r = jsonToYAML(value);
@@ -373,7 +444,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
         setDocCount(0);
         setDiffChanges([]);
       } else if (tab === "diff") {
-        const r = formatYAML(value, { indent, sortKeys });
+        const r = formatYAML(value, { indent, sortKeys, quoteStyle });
         if (r.valid) {
           const diff = computeDiff(value, r.result);
           setOutput(r.result);
@@ -387,7 +458,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
           setError(r.error ?? null);
         }
       } else {
-        const r = formatYAML(value, { indent, sortKeys });
+        const r = formatYAML(value, { indent, sortKeys, quoteStyle });
         setOutput(r.result);
         setFormatTime(performance.now() - t0);
         setError(r.valid ? null : (r.error ?? null));
@@ -397,7 +468,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
         }
       }
     },
-    [tab, indent, sortKeys],
+    [tab, indent, sortKeys, quoteStyle],
   );
 
   const processYAMLRef = useRef(processYAML);
@@ -409,7 +480,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
   const handleFormat = useCallback(() => {
     if (!input.trim()) return;
     const t0 = performance.now();
-    const r = formatYAML(input, { indent, sortKeys });
+    const r = formatYAML(input, { indent, sortKeys, quoteStyle });
     if (r.valid) {
       setOutput(r.result);
       setError(null);
@@ -421,7 +492,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
       setFormatTime(null);
     }
     setTab("format");
-  }, [input, indent, sortKeys]);
+  }, [input, indent, sortKeys, quoteStyle]);
 
   // Drag-drop handler
   const handleDragDrop = useCallback((text: string) => {
@@ -583,6 +654,20 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleDownload = () => {
+    if (!output) return;
+    const ext = tab === "to-json" ? "json" : "yaml";
+    const blob = new Blob([output], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `yaml-formatter-output.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const handleClear = () => {
     if (inputEditor.current) {
       inputEditor.current.dispatch({
@@ -669,8 +754,11 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
             <button onClick={() => handleTabChange("diff")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors border-r border-zinc-200 ${tab === "diff" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
               Diff
             </button>
-            <button onClick={() => handleTabChange("schema")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors ${tab === "schema" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
+            <button onClick={() => handleTabChange("schema")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors border-r border-zinc-200 ${tab === "schema" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
               Schema
+            </button>
+            <button onClick={() => handleTabChange("tree")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors ${tab === "tree" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
+              Tree
             </button>
           </div>
 
@@ -681,6 +769,12 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
                 <option value={2}>Indent: 2</option>
                 <option value={4}>Indent: 4</option>
                 <option value={8}>Indent: 8</option>
+              </select>
+              <select value={quoteStyle} onChange={(e) => setQuoteStyle(e.target.value as "double" | "single" | "plain")}
+                className="text-sm px-2.5 py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-600 cursor-pointer">
+                <option value="plain">Quotes: Auto</option>
+                <option value="double">Quotes: Double</option>
+                <option value="single">Quotes: Single</option>
               </select>
               <label className="flex items-center gap-1.5 text-xs text-zinc-500 cursor-pointer select-none">
                 <input type="checkbox" checked={sortKeys} onChange={(e) => setSortKeys(e.target.checked)}
@@ -776,12 +870,22 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
             {tab !== "format" && (
               <div className="absolute top-2 left-2 z-10 select-none pointer-events-none">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-md bg-blue-100 text-blue-700 border border-blue-200">
-                  {tab === "to-json" ? "YAML → JSON" : tab === "json-to-yaml" ? "JSON → YAML" : tab === "diff" ? "Diff" : "Schema"}
+                  {tab === "to-json" ? "YAML → JSON" : tab === "json-to-yaml" ? "JSON → YAML" : tab === "diff" ? "Diff" : tab === "schema" ? "Schema" : "Tree"}
                 </span>
               </div>
             )}
             <div className="h-full bg-zinc-50/50 overflow-auto">
-            {tab === "diff" && diffChanges.length > 0 ? (
+            {tab === "tree" ? (
+              <div className="p-4 h-full">
+                {error ? (
+                  <div className="text-sm text-red-600 font-mono">{error.message}</div>
+                ) : treeData !== null && treeData !== undefined ? (
+                  <TreeNode name={null} value={treeData} depth={0} />
+                ) : (
+                  <div className="text-sm text-zinc-400">Parsed tree will appear here</div>
+                )}
+              </div>
+            ) : tab === "diff" && diffChanges.length > 0 ? (
               <div className="font-mono text-sm h-full">
                 {output.split("\n").map((line, i) => {
                   const change = diffChanges.find((c) => c.line === i + 1);
@@ -878,8 +982,13 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
               </div>
             )}
             </div>
-            {output && !error && tab !== "diff" && tab !== "schema" && (
-              <div className="absolute bottom-3 right-3 z-10 select-none">
+            {output && !error && tab !== "diff" && tab !== "schema" && tab !== "tree" && (
+              <div className="absolute bottom-3 right-3 z-10 select-none flex items-center gap-2">
+                <button onClick={handleDownload}
+                  className="flex items-center gap-2 px-3 py-2 text-base font-medium rounded-xl border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 shadow-sm transition-all">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Download
+                </button>
                 <button onClick={handleCopy}
                   className="flex items-center gap-2 px-4 py-2 text-base font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>

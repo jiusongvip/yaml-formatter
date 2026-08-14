@@ -5,6 +5,7 @@ export interface FormatOptions {
   indent?: number;
   sortKeys?: boolean;
   stripComments?: boolean;
+  quoteStyle?: "double" | "single" | "plain";
 }
 
 export interface FormatResult {
@@ -55,15 +56,21 @@ export function splitDocuments(input: string): string[] {
   return docs.filter((d) => d.length > 0);
 }
 
+const QUOTE_STYLE_MAP = {
+  double: "QUOTE_DOUBLE",
+  single: "QUOTE_SINGLE",
+  plain: "PLAIN",
+} as const;
+
 function formatSingleYAML(input: string, options: FormatOptions = {}): FormatResult {
-  const { indent = 2, sortKeys = false, stripComments = false } = options;
+  const { indent = 2, sortKeys = false, stripComments = false, quoteStyle } = options;
   try {
     let doc;
     if (stripComments) {
       // Use parseDocument to strip comments, then convert back
       const parsed = parseDocument(input);
-      parsed.comment = undefined;
-      parsed.commentBefore = undefined;
+      parsed.comment = null;
+      parsed.commentBefore = null;
       // Re-parse without comments to get clean object
       doc = parse(input);
     } else {
@@ -72,7 +79,11 @@ function formatSingleYAML(input: string, options: FormatOptions = {}): FormatRes
     if (doc === null || doc === undefined) {
       return { result: "", valid: true };
     }
-    const result = stringify(doc, { indent, sortMapEntries: sortKeys });
+    const result = stringify(doc, {
+      indent,
+      sortMapEntries: sortKeys,
+      defaultStringType: quoteStyle ? QUOTE_STYLE_MAP[quoteStyle] : undefined,
+    });
     return { result, valid: true };
   } catch (e: unknown) {
     const err = e as { linePos?: Array<{ line: number; col: number }>; message: string };
