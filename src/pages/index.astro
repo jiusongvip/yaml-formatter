@@ -8,6 +8,7 @@ import HowItWorks from '../components/HowItWorks.astro';
 import UseCases from '../components/UseCases.astro';
 import TypeMapping from '../components/TypeMapping.astro';
 import Examples from '../components/Examples.astro';
+import Comparison from '../components/Comparison.astro';
 import RelatedTools from '../components/RelatedTools.astro';
 import Guides from '../components/Guides.astro';
 import FAQ from '../components/FAQ.astro';
@@ -57,7 +58,7 @@ const jsonLd = {
 
 <BaseLayout
   title="YAML Formatter - Free Online YAML Beautifier & Validator"
-  description="Free online YAML formatter that runs entirely in your browser. Format, validate, and convert YAML to JSON instantly. 100% client-side, zero server upload."
+  description="Free online YAML formatter, validator, and YAML to JSON converter. Format, validate, and convert with tree view, diff, and JSON Schema support — 100% client-side."
 >
   <Header />
   <main>
@@ -68,6 +69,7 @@ const jsonLd = {
     <UseCases />
     <TypeMapping />
     <Examples />
+    <Comparison />
     <FAQ />
     <RelatedTools />
     <Guides />
