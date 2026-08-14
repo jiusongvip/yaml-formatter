@@ -516,6 +516,24 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
     }
   }, [error, tab]);
 
+  const handleTabChange = (newTab: TabType) => {
+    if (newTab === tab) return;
+    inputsRef.current[tab] = input;
+    const target = inputsRef.current[newTab] ?? (newTab === "json-to-yaml" ? DEFAULT_JSON_INPUT : DEFAULT_YAML);
+    inputsRef.current[newTab] = target;
+    suppressChangeRef.current = true;
+    if (inputEditor.current) {
+      inputEditor.current.dispatch({
+        changes: { from: 0, to: inputEditor.current.state.doc.length, insert: target },
+      });
+    }
+    suppressChangeRef.current = false;
+    setInput(target);
+    setTab(newTab);
+  };
+  const handleTabChangeRef = useRef(handleTabChange);
+  handleTabChangeRef.current = handleTabChange;
+
   // Load tab from URL hash on mount and whenever the hash changes
   useEffect(() => {
     const applyHash = () => {
@@ -528,7 +546,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
       };
       const target = tabMap[hash];
       if (target) {
-        setTab(target);
+        handleTabChangeRef.current(target);
         document.getElementById("formatter")?.scrollIntoView({ behavior: "smooth" });
       }
     };
@@ -557,25 +575,6 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
       }
     }
   }, []);
-
-  const handleTabChange = (newTab: TabType) => {
-    if (newTab === tab) return;
-    // 保存当前 tab 的输入，切回时可恢复
-    inputsRef.current[tab] = input;
-    // 目标 tab 的输入：已保存的优先，否则用默认示例
-    const target = inputsRef.current[newTab] ?? (newTab === "json-to-yaml" ? DEFAULT_JSON_INPUT : DEFAULT_YAML);
-    inputsRef.current[newTab] = target;
-    // 替换编辑器内容（跳过 cm-change 的即时处理，由 useEffect [tab] 统一处理）
-    suppressChangeRef.current = true;
-    if (inputEditor.current) {
-      inputEditor.current.dispatch({
-        changes: { from: 0, to: inputEditor.current.state.doc.length, insert: target },
-      });
-    }
-    suppressChangeRef.current = false;
-    setInput(target);
-    setTab(newTab);
-  };
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(output);
