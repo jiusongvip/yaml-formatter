@@ -12,6 +12,13 @@
       <div>
         <h3 class="h-sub text-zinc-900">1. Tabs Instead of Spaces</h3>
         <p>YAML forbids tabs for indentation, but many editors insert them silently. The parser throws "found character that cannot start any token." Configure your editor to insert spaces (<code>"editor.insertSpaces": true</code> in VS Code) and use a <a href="/#formatter">YAML formatter</a> to auto-detect tabs.</p>
+        <pre><code># BROKEN (tab indentation)
+deployment:
+&rarr;&rarr;name: my-app
+
+# FIXED (spaces only)
+deployment:
+  name: my-app</code></pre>
       </div>
 
       <div>
@@ -51,11 +58,33 @@ country: "NO"</code></pre>
       <div>
         <h3 class="h-sub text-zinc-900">5. Broken Anchors and Aliases</h3>
         <p>A typo in an alias name (<code>*defalts</code> instead of <code>*defaults</code>) fails the parse, while an unresolved merge silently drops keys. Validate that every <code>*alias</code> has a matching <code>&amp;anchor</code>.</p>
+        <pre><code># BROKEN — typo in alias name
+defaults: &amp;defaults
+  timeout: 30
+service:
+  &lt;&lt;: *defalts   # no matching anchor
+
+# FIXED
+defaults: &amp;defaults
+  timeout: 30
+service:
+  &lt;&lt;: *defaults</code></pre>
       </div>
 
       <div>
         <h3 class="h-sub text-zinc-900">6. Multi-Document Separator Issues</h3>
         <p>Content after a <code>...</code> end-of-stream marker is invalid, and a bare <code>---</code> at the top starts a new document. Keep separators on their own lines.</p>
+        <pre><code># BROKEN — content after end-of-stream marker
+---
+first: doc
+...
+second: doc   # invalid, ... ends the stream
+
+# FIXED
+---
+first: doc
+---
+second: doc</code></pre>
       </div>
 
       <div>
