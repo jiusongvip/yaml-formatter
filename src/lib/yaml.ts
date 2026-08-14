@@ -213,3 +213,107 @@ export async function validateSchema(yamlInput: string, schemaJson: string): Pro
     return { valid: false, errors: [{ path: "(schema)", message: err.message || "Invalid JSON Schema", keyword: "parse" }] };
   }
 }
+
+// ---------- YAML -> TOML conversion (pure client-side) ----------
+
+function tomlEscapeString(s: string): string {
+  return s
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r")
+    .replace(/\t/g, "\\t")
+    .replace(/[\x00-\x1f\x7f]/g, (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0"));
+}
+
+function tomlKey(k: string): string {
+  return /^[A-Za-z0-9_-]+$/.test(k) ? k : '"' + tomlEscapeString(k) + '"';
+}
+
+function tomlScalar(v: unknown): string | null {
+  if (v === null || v === undefined) return null; // TOML has no null
+  if (typeof v === "string") return '"' + tomlEscapeString(v) + '"';
+  if (typeof v === "boolean") return v ? "true" : "false";
+  if (typeof v === "number") return Number.isFinite(v) ? String(v) : null;
+  if (Array.isArray(v)) {
+    const items = v.map(tomlScalar).filter((x): x is string => x !== null);
+    return "[" + items.join(", ") + "]";
+  }
+  return null;
+}
+
+function isArrayOfObjects(arr: unknown[]): boolean {
+  return arr.length > 0 && arr.every((x) => x !== null && typeof x === "object" && !Array.isArray(x));
+}
+
+// Serialize a mapping into TOML lines. Scalars are emitted first, then nested
+// tables and array-of-tables, so later [table] headers never swallow loose keys.
+function serializeTOMLTable(obj: Record<string, unknown>, path: string[], lines: string[]): void {
+  const entries = Object.entries(obj);
+  for (const [k, v] of entries) {
+    const isTable = v !== null && typeof v === "object" && !Array.isArray(v);
+    const isArrayTable = Array.isArray(v) && isArrayOfObjects(v);
+    if (isTable || isArrayTable) continue;
+    const s = tomlScalar(v);
+    if (s !== null) lines.push(tomlKey(k) + " = " + s);
+  }
+  for (const [k, v] of entries) {
+    if (v !== null && typeof v === "object" && !Array.isArray(v)) {
+      lines.push("");
+      lines.push("[" + [...path, k].map(tomlKey).join(".") + "]");
+      serializeTOMLTable(v as Record<string, unknown>, [...path, k], lines);
+    } else if (Array.isArray(v) && isArrayOfObjects(v)) {
+      for (const item of v as Record<string, unknown>[]) {
+        lines.push("");
+        lines.push("[[" + [...path, k].map(tomlKey).join(".") + "]]");
+        serializeTOMLTable(item, [...path, k], lines);
+      }
+    }
+  }
+}
+
+// Convert YAML to TOML. TOML has no null literal, so null values are dropped
+// rather than emitted as invalid syntax.
+export function yamlToTOML(input: string): FormatResult {
+  try {
+    const doc = parse(input);
+    if (doc === null || doc === undefined) {
+      return { result: "", valid: true };
+    }
+    if (typeof doc !== "object" || Array.isArray(doc)) {
+      return { result: input, valid: false, error: { line: 1, col: 1, message: "TOML conversion requires a top-level mapping (key/value object)." } };
+    }
+    const lines: string[] = [];
+    serializeTOMLTable(doc as Record<string, unknown>, [], lines);
+    return { result: lines.join("\n").replace(/^\n+/, ""), valid: true };
+  } catch (e: unknown) {
+    const err = e as { linePos?: Array<{ line: number; col: number }>; message: string };
+    return {
+      result: input,
+      valid: false,
+      error: {
+        line: err.linePos?.[0]?.line ?? 1,
+        col: err.linePos?.[0]?.col ?? 0,
+        message: err.message || "Unknown YAML error",
+      },
+    };
+  }
+}
+
+// ---------- Input format auto-detection ----------
+
+export type DetectedFormat = "yaml" | "json" | "unknown";
+
+export function detectInputFormat(input: string): DetectedFormat {
+  const t = input.trim();
+  if (!t) return "unknown";
+  if (t.startsWith("{") || t.startsWith("[")) {
+    try {
+      JSON.parse(t);
+      return "json";
+    } catch {
+      return "yaml"; // braces/brackets can also start valid YAML flow collections
+    }
+  }
+  return "yaml";
+}

@@ -1,0 +1,24 @@
+# YAML Formatter
+
+> Free online YAML formatter, validator, and converter that runs 100% in the browser. Format, validate, beautify, and convert YAML to JSON or TOML with no server upload.
+
+## What this tool does
+
+- Format / beautify YAML with configurable indent (2/4/8), key sorting, and quote style (auto/double/single)
+- Validate against the YAML 1.2 specification with exact line and column error reporting
+- Convert YAML to JSON, JSON to YAML, and YAML to TOML
+- Expand YAML anchors (&), aliases (*), and merge keys (<<) into resolved values
+- Validate YAML against a JSON Schema (built-in tab)
+- Visualize YAML as a collapsible tree view with type-colored values
+- Show a before/after diff of formatting changes
+- Support multi-document files, drag-and-drop upload, URL loading, and shareable links
+
+## Pages
+
+- [Home / YAML Formatter](https://yamlformatter.com/): The single-page tool with all capabilities — Format, YAML to JSON, YAML to TOML, JSON to YAML, Diff, Schema, and Tree tabs
+- [Privacy Policy](https://yamlformatter.com/privacy/): How the tool handles data (all processing is client-side)
+
+## Notes
+
+- All processing is client-side JavaScript; user data never leaves the browser.
+- The tool is free with no sign-up, no usage caps, and no ads.
