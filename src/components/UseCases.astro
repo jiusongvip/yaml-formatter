@@ -1,18 +1,31 @@
 ---
 ---
+
 <section id="use-cases" class="section">
   <div class="container-tool">
     <div class="text-center max-w-2xl mx-auto mb-10">
       <p class="eyebrow">Use cases</p>
       <h2 class="h-section mt-3">YAML everywhere you work</h2>
-      <p class="lead mt-4">YAML is the backbone of modern infrastructure-as-code. These are the files our formatter cleans up most.</p>
+      <p class="lead mt-4">YAML is the backbone of modern infrastructure-as-code. Here's how our formatter helps with the files you touch every day.</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       {[
-        { title: 'Kubernetes manifests', desc: 'Deployments, services, configmaps — all defined in YAML. A misplaced space can stop a pod from scheduling. Validate structure and keep indentation consistent.' },
-        { title: 'Docker Compose', desc: 'Multi-container apps rely on docker-compose.yml. Ensure services, networks, and volumes are nested and readable.' },
-        { title: 'CI/CD pipelines', desc: 'GitHub Actions, GitLab CI, and CircleCI use YAML workflows. Handles multi-document files and job matrices with ease.' },
-        { title: 'Ansible playbooks', desc: 'Tasks, handlers, and roles in YAML. Clean formatting keeps complex playbooks maintainable across a team.' },
+        {
+          title: 'Kubernetes manifests',
+          desc: 'Deployments, Services, ConfigMaps, and Ingresses are all YAML. A single misplaced space or tab stops a pod from scheduling, and kubectl only reports "error converting YAML to JSON" without a line number. Our formatter pinpoints the exact line and column, and the tree view lets you verify that every field is nested at the right level before you run kubectl apply.',
+        },
+        {
+          title: 'Docker Compose',
+          desc: 'Multi-container apps depend on docker-compose.yml. If the ports, environment, or volumes keys land at the wrong indentation level, Compose silently ignores them and your service starts misconfigured. Our formatter normalizes indentation and the tree view confirms each key sits under the right service, so you catch nesting mistakes before docker compose up.',
+        },
+        {
+          title: 'CI/CD pipelines',
+          desc: 'GitHub Actions, GitLab CI, and CircleCI all define workflows in YAML. Multi-document files, job matrices, and conditional expressions are easy to get wrong, and a broken pipeline blocks every deploy. Our formatter processes each --- separated document independently, while the diff view shows exactly what changed so you can review pipeline edits with confidence.',
+        },
+        {
+          title: 'Ansible playbooks',
+          desc: 'Ansible tasks, handlers, roles, and inventories all live in YAML. Complex playbooks run hundreds of lines, and inconsistent indentation causes tasks to execute in the wrong order or against the wrong hosts. Our formatter keeps indentation uniform across the whole file, making large playbooks readable and maintainable for the entire team.',
+        },
       ].map(({ title, desc }) => (
         <div class="p-6 rounded-2xl border border-zinc-200 bg-white">
           <h3 class="h-sub">{title}</h3>

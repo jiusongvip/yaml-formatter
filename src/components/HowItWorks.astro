@@ -1,16 +1,18 @@
 ---
 ---
+
 <section id="how-it-works" class="section band-soft">
   <div class="container-tool">
     <div class="text-center max-w-2xl mx-auto mb-10">
       <p class="eyebrow">How it works</p>
       <h2 class="h-section mt-3">Format YAML in three steps</h2>
+      <p class="lead mt-4">No install, no sign-up. Your YAML is formatted the moment it hits the editor.</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       {[
-        { step: '1', title: 'Paste or drop a file', desc: 'Paste YAML from any source — a config file, a CI/CD pipeline, or a Kubernetes manifest. Or drag and drop a .yaml / .yml file into the editor.' },
-        { step: '2', title: 'It formats automatically', desc: 'A YAML 1.2 parser normalizes indentation, fixes spacing, and flags syntax errors with the exact line — all locally, in milliseconds.' },
-        { step: '3', title: 'Copy, convert, compare', desc: 'Copy the clean output, switch to the YAML to JSON tab, or use the diff view to compare before and after. Ctrl+Enter formats on demand.' },
+        { step: '1', title: 'Paste or drop a file', desc: 'Paste YAML from any source — a config file, a CI/CD pipeline, a Kubernetes manifest, or an Ansible playbook. You can also drag and drop a .yaml or .yml file straight into the editor, load it from a URL, or start from one of the built-in examples.' },
+        { step: '2', title: 'It formats automatically', desc: 'A YAML 1.2 parser normalizes indentation, fixes spacing, and flags syntax errors with the exact line and column — all locally in your browser, in milliseconds. The status bar shows validity, line count, and processing time as you work.' },
+        { step: '3', title: 'Copy, convert, compare', desc: 'Copy the clean output, switch to the YAML to JSON tab to convert it, use the diff view to see exactly what changed, or download the result as a .yaml or .json file. Ctrl+Enter formats on demand.' },
       ].map(({ step, title, desc }) => (
         <div class="text-center">
           <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-50 text-blue-700 font-semibold text-lg mb-5">{step}</span>
