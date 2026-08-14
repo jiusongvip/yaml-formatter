@@ -1,0 +1,35 @@
+---
+---
+
+<section id="why-built" class="section">
+  <div class="container-tool max-w-3xl">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <p class="eyebrow">Why we built this</p>
+      <h2 class="h-section mt-3">The YAML formatter we wish existed</h2>
+    </div>
+    <div class="space-y-5 text-zinc-600 leading-relaxed">
+      <p>
+        Every YAML formatter we tried forced the same trade-off: paste our production configs
+        into a server we don't trust, or click a "Format" button and wait. Neither fit how we
+        actually work, so we built the tool we kept wishing for.
+      </p>
+      <p>
+        The breaking point was a late-night incident — a single stray tab in a Kubernetes
+        manifest took a service down, and <code class="text-xs px-1.5 py-0.5 rounded bg-zinc-100">kubectl</code>
+        only said <em>"error converting YAML to JSON"</em> with no line number. We spent an hour
+        hunting for a character we couldn't see.
+      </p>
+      <p>
+        That night shaped everything here: formatting that happens <strong>as you type</strong>,
+        errors that point to the <strong>exact line and column</strong>, and processing that runs
+        <strong>100% in your browser</strong> — no upload, no account, no ads. Your configs never
+        leave your machine.
+      </p>
+      <p>
+        It's free and open source because a YAML formatter is a tool every developer should have,
+        not a product to be upsold. If it saves you even one late-night debugging session, it has
+        done its job.
+      </p>
+    </div>
+  </div>
+</section>

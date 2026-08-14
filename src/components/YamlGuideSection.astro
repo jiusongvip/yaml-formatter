@@ -11,7 +11,7 @@
     <div class="space-y-6 text-zinc-600 leading-relaxed">
       <div>
         <h3 class="h-sub text-zinc-900">What is YAML?</h3>
-        <p>YAML (YAML Ain't Markup Language) is a human-readable data serialization format used for configuration files. Unlike JSON, which uses braces and quotes, YAML uses indentation to express structure — making it far easier to read and write by hand. That readability is why it's the default configuration language across the DevOps ecosystem.</p>
+        <p>YAML (YAML Ain't Markup Language) is a human-readable data serialization format used for configuration files. Unlike JSON, which uses braces and quotes, YAML uses indentation to express structure — making it far easier to read and write by hand. That readability is why it's the default configuration language across the DevOps ecosystem. This tool targets the <a href="https://yaml.org/spec/1.2.2/" rel="noopener" target="_blank">YAML 1.2 specification</a>.</p>
       </div>
 
       <div>
@@ -61,6 +61,27 @@ metadata:
 kind: Deployment
 metadata:
   name: my-deployment</code></pre>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">Multi-line strings: block scalars</h3>
+        <p>YAML offers two block styles for long strings. The <strong>literal style</strong> (<code>|</code>) preserves every line break — use it for shell scripts, certificates, and ConfigMap data. The <strong>folded style</strong> (<code>&gt;</code>) converts single line breaks into spaces — use it for long prose that should reflow. A <strong>chomping indicator</strong> (<code>-</code> or <code>+</code>) controls the final trailing newline.</p>
+        <pre class="p-4 text-[13px] leading-relaxed overflow-x-auto rounded-lg bg-zinc-50 border border-zinc-200"><code># Literal (|): keep every newline
+script: |
+  #!/bin/bash
+  echo "line 1"
+  echo "line 2"
+
+# Folded (>): single breaks become spaces
+description: >
+  This long description folds
+  into one readable line.
+
+# Chomping: strip or keep the final newline
+folded_strip: >-   # no trailing newline
+  text here
+literal_keep: |+   # keep trailing blank lines
+  text here</code></pre>
       </div>
 
       <div>

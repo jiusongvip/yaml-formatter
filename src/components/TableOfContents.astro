@@ -1,0 +1,29 @@
+---
+const items = [
+  { href: '#features', label: 'Features' },
+  { href: '#how-it-works', label: 'How it works' },
+  { href: '#use-cases', label: 'Use cases' },
+  { href: '#yaml-guide', label: 'YAML guide' },
+  { href: '#type-mapping', label: 'Type mapping' },
+  { href: '#examples', label: 'Examples' },
+  { href: '#yaml-errors', label: 'Common errors' },
+  { href: '#format-comparison', label: 'Format comparison' },
+  { href: '#why-built', label: 'Why we built this' },
+  { href: '#comparison', label: 'Alternatives' },
+  { href: '#faq', label: 'FAQ' },
+];
+---
+
+<nav aria-label="On this page" class="container-tool py-5 border-t border-zinc-100">
+  <div class="flex flex-wrap items-center gap-2">
+    <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mr-1">On this page</span>
+    {items.map((i) => (
+      <a
+        href={i.href}
+        class="text-sm px-3 py-1 rounded-full border border-zinc-200 text-zinc-600 hover:border-blue-300 hover:text-blue-600 no-underline transition-colors"
+      >
+        {i.label}
+      </a>
+    ))}
+  </div>
+</nav>

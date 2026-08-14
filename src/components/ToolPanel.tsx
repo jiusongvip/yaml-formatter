@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { formatYAML, yamlToJSON, jsonToYAML, yamlToTOML, countDocuments, computeDiff, expandAnchors as expandYamlAnchors, validateSchema, detectInputFormat } from "../lib/yaml";
+import { formatYAML, yamlToJSON, jsonToYAML, yamlToTOML, yamlToXML, countDocuments, computeDiff, expandAnchors as expandYamlAnchors, validateSchema, detectInputFormat } from "../lib/yaml";
 import { parse } from "yaml";
 import type { DiffChange, SchemaValidationResult } from "../lib/yaml";
 import { EditorView, keymap, lineNumbers, highlightActiveLine, Decoration, type DecorationSet } from "@codemirror/view";
@@ -217,7 +217,7 @@ const DEFAULT_JSON_INPUT = `{
   }
 }`;
 
-type TabType = "format" | "to-json" | "to-toml" | "json-to-yaml" | "diff" | "schema" | "tree";
+type TabType = "format" | "to-json" | "to-toml" | "to-xml" | "json-to-yaml" | "diff" | "schema" | "tree";
 
 // Recursive tree view node (uses native <details> for folding)
 function TreeLeaf({ name, value, type }: { name: string | null; value: string; type: string }) {
@@ -445,6 +445,13 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
         setFormatTime(performance.now() - t0);
         setDocCount(0);
         setDiffChanges([]);
+      } else if (tab === "to-xml") {
+        const r = yamlToXML(value);
+        setOutput(r.result);
+        setError(r.valid ? null : (r.error ?? null));
+        setFormatTime(performance.now() - t0);
+        setDocCount(0);
+        setDiffChanges([]);
       } else if (tab === "to-json") {
         const r = yamlToJSON(value);
         setOutput(r.result);
@@ -626,6 +633,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
       const tabMap: Record<string, TabType> = {
         "#yaml-to-json": "to-json",
         "#yaml-to-toml": "to-toml",
+        "#yaml-to-xml": "to-xml",
         "#json-to-yaml": "json-to-yaml",
         "#diff": "diff",
         "#format": "format",
@@ -671,7 +679,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
 
   const handleDownload = () => {
     if (!output) return;
-    const ext = tab === "to-json" ? "json" : tab === "to-toml" ? "toml" : "yaml";
+    const ext = tab === "to-json" ? "json" : tab === "to-toml" ? "toml" : tab === "to-xml" ? "xml" : "yaml";
     const blob = new Blob([output], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -765,6 +773,9 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
             </button>
             <button onClick={() => handleTabChange("to-toml")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors border-r border-zinc-200 ${tab === "to-toml" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
               YAML to TOML
+            </button>
+            <button onClick={() => handleTabChange("to-xml")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors border-r border-zinc-200 ${tab === "to-xml" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
+              YAML to XML
             </button>
             <button onClick={() => handleTabChange("json-to-yaml")} className={`px-3.5 py-1.5 text-base font-semibold transition-colors border-r border-zinc-200 ${tab === "json-to-yaml" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100"}`}>
               JSON to YAML
@@ -909,7 +920,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
             {tab !== "format" && (
               <div className="absolute top-2 left-2 z-10 select-none pointer-events-none">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-md bg-blue-100 text-blue-700 border border-blue-200">
-                  {tab === "to-json" ? "YAML → JSON" : tab === "to-toml" ? "YAML → TOML" : tab === "json-to-yaml" ? "JSON → YAML" : tab === "diff" ? "Diff" : tab === "schema" ? "Schema" : "Tree"}
+                  {tab === "to-json" ? "YAML → JSON" : tab === "to-toml" ? "YAML → TOML" : tab === "to-xml" ? "YAML → XML" : tab === "json-to-yaml" ? "JSON → YAML" : tab === "diff" ? "Diff" : tab === "schema" ? "Schema" : "Tree"}
                 </span>
               </div>
             )}
@@ -1016,7 +1027,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
             ) : (
               <div className="flex items-center justify-center h-full">
                 <span className="text-sm text-zinc-400">
-                  {tab === "format" ? "Formatted YAML will appear here" : tab === "to-json" ? "JSON output will appear here" : tab === "to-toml" ? "TOML output will appear here" : tab === "json-to-yaml" ? "YAML output will appear here" : tab === "diff" ? "Diff view — format first to see changes" : "Enter a JSON Schema above to validate your YAML"}
+                  {tab === "format" ? "Formatted YAML will appear here" : tab === "to-json" ? "JSON output will appear here" : tab === "to-toml" ? "TOML output will appear here" : tab === "to-xml" ? "XML output will appear here" : tab === "json-to-yaml" ? "YAML output will appear here" : tab === "diff" ? "Diff view — format first to see changes" : "Enter a JSON Schema above to validate your YAML"}
                 </span>
               </div>
             )}

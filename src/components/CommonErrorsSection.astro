@@ -47,7 +47,7 @@ name: John Doe</code></pre>
 
       <div>
         <h3 class="h-sub text-zinc-900">4. Accidental Boolean Conversion (The Norway Problem)</h3>
-        <p>In YAML 1.1, values like <code>NO</code>, <code>YES</code>, <code>ON</code>, and <code>OFF</code> become booleans. Always quote ambiguous strings and use <code>true/false</code> for booleans.</p>
+        <p>In YAML 1.1, values like <code>NO</code>, <code>YES</code>, <code>ON</code>, and <code>OFF</code> are coerced into booleans — the infamous "Norway problem". YAML 1.2 fixed this by treating only <code>true</code> and <code>false</code> as booleans, but many parsers and legacy tools still use 1.1 semantics. Always quote ambiguous strings to stay safe across both.</p>
         <pre class="p-4 text-[13px] leading-relaxed overflow-x-auto rounded-lg bg-zinc-50 border border-zinc-200"><code># DANGEROUS in YAML 1.1
 country: NO    # becomes boolean false
 

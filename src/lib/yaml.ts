@@ -317,3 +317,90 @@ export function detectInputFormat(input: string): DetectedFormat {
   }
   return "yaml";
 }
+
+// ---------- YAML -> XML conversion (pure client-side) ----------
+
+function xmlEscape(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+// XML element names cannot start with a digit and may not contain spaces or
+// most punctuation, so normalize keys into legal tag names.
+function xmlTagName(key: string): string {
+  let name = key.replace(/[^A-Za-z0-9_.-]/g, "_");
+  if (/^[0-9]/.test(name)) name = "_" + name;
+  return name || "item";
+}
+
+function xmlSerializeValue(value: unknown, tag: string, indent: number, lines: string[]): void {
+  const pad = "  ".repeat(indent);
+  if (value === null || value === undefined) {
+    lines.push(`${pad}<${tag} />`);
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      xmlSerializeValue(item, tag, indent, lines);
+    }
+    return;
+  }
+  if (typeof value === "object") {
+    lines.push(`${pad}<${tag}>`);
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      xmlSerializeValue(v, xmlTagName(k), indent + 1, lines);
+    }
+    lines.push(`${pad}</${tag}>`);
+    return;
+  }
+  lines.push(`${pad}<${tag}>${xmlEscape(String(value))}</${tag}>`);
+}
+
+// Convert YAML to XML. XML requires exactly one root element, so a multi-key
+// top-level mapping is wrapped in a <root> element; a single-key mapping uses
+// that key as the root instead.
+export function yamlToXML(input: string): FormatResult {
+  try {
+    const doc = parse(input);
+    if (doc === null || doc === undefined) {
+      return { result: "", valid: true };
+    }
+    const lines: string[] = ['<?xml version="1.0" encoding="UTF-8"?>'];
+    if (Array.isArray(doc)) {
+      lines.push("<root>");
+      for (const item of doc) {
+        xmlSerializeValue(item, "item", 1, lines);
+      }
+      lines.push("</root>");
+    } else if (typeof doc === "object") {
+      const entries = Object.entries(doc as Record<string, unknown>);
+      if (entries.length === 1) {
+        xmlSerializeValue(doc, xmlTagName(entries[0][0]), 0, lines);
+      } else {
+        lines.push("<root>");
+        for (const [k, v] of entries) {
+          xmlSerializeValue(v, xmlTagName(k), 1, lines);
+        }
+        lines.push("</root>");
+      }
+    } else {
+      lines.push(`<root>${xmlEscape(String(doc))}</root>`);
+    }
+    return { result: lines.join("\n"), valid: true };
+  } catch (e: unknown) {
+    const err = e as { linePos?: Array<{ line: number; col: number }>; message: string };
+    return {
+      result: input,
+      valid: false,
+      error: {
+        line: err.linePos?.[0]?.line ?? 1,
+        col: err.linePos?.[0]?.col ?? 0,
+        message: err.message || "Unknown YAML error",
+      },
+    };
+  }
+}
