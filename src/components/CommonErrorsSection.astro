@@ -12,7 +12,7 @@
       <div>
         <h3 class="h-sub text-zinc-900">1. Tabs Instead of Spaces</h3>
         <p>YAML forbids tabs for indentation, but many editors insert them silently. The parser throws "found character that cannot start any token." Configure your editor to insert spaces (<code>"editor.insertSpaces": true</code> in VS Code) and use a <a href="/#formatter">YAML formatter</a> to auto-detect tabs.</p>
-        <pre><code># BROKEN (tab indentation)
+        <pre class="p-4 text-[13px] leading-relaxed overflow-x-auto rounded-lg bg-zinc-50 border border-zinc-200"><code># BROKEN (tab indentation)
 deployment:
 &rarr;&rarr;name: my-app
 
@@ -24,7 +24,7 @@ deployment:
       <div>
         <h3 class="h-sub text-zinc-900">2. Inconsistent Indentation Levels</h3>
         <p>Mixing 2-space and 4-space indentation confuses the parser about nesting, silently moving keys to the wrong level.</p>
-        <pre><code># BROKEN (mixed indentation)
+        <pre class="p-4 text-[13px] leading-relaxed overflow-x-auto rounded-lg bg-zinc-50 border border-zinc-200"><code># BROKEN (mixed indentation)
 server:
   host: localhost
     port: 8080   # nested under host instead of server
@@ -38,7 +38,7 @@ server:
       <div>
         <h3 class="h-sub text-zinc-900">3. Missing Space After Colon</h3>
         <p>Without a space after the colon, the whole pair is read as a single string instead of a mapping.</p>
-        <pre><code># BROKEN
+        <pre class="p-4 text-[13px] leading-relaxed overflow-x-auto rounded-lg bg-zinc-50 border border-zinc-200"><code># BROKEN
 name:John Doe
 
 # FIXED
@@ -48,7 +48,7 @@ name: John Doe</code></pre>
       <div>
         <h3 class="h-sub text-zinc-900">4. Accidental Boolean Conversion (The Norway Problem)</h3>
         <p>In YAML 1.1, values like <code>NO</code>, <code>YES</code>, <code>ON</code>, and <code>OFF</code> become booleans. Always quote ambiguous strings and use <code>true/false</code> for booleans.</p>
-        <pre><code># DANGEROUS in YAML 1.1
+        <pre class="p-4 text-[13px] leading-relaxed overflow-x-auto rounded-lg bg-zinc-50 border border-zinc-200"><code># DANGEROUS in YAML 1.1
 country: NO    # becomes boolean false
 
 # SAFE
@@ -58,7 +58,7 @@ country: "NO"</code></pre>
       <div>
         <h3 class="h-sub text-zinc-900">5. Broken Anchors and Aliases</h3>
         <p>A typo in an alias name (<code>*defalts</code> instead of <code>*defaults</code>) fails the parse, while an unresolved merge silently drops keys. Validate that every <code>*alias</code> has a matching <code>&amp;anchor</code>.</p>
-        <pre><code># BROKEN — typo in alias name
+        <pre class="p-4 text-[13px] leading-relaxed overflow-x-auto rounded-lg bg-zinc-50 border border-zinc-200"><code># BROKEN — typo in alias name
 defaults: &amp;defaults
   timeout: 30
 service:
@@ -74,7 +74,7 @@ service:
       <div>
         <h3 class="h-sub text-zinc-900">6. Multi-Document Separator Issues</h3>
         <p>Content after a <code>...</code> end-of-stream marker is invalid, and a bare <code>---</code> at the top starts a new document. Keep separators on their own lines.</p>
-        <pre><code># BROKEN — content after end-of-stream marker
+        <pre class="p-4 text-[13px] leading-relaxed overflow-x-auto rounded-lg bg-zinc-50 border border-zinc-200"><code># BROKEN — content after end-of-stream marker
 ---
 first: doc
 ...
@@ -90,7 +90,7 @@ second: doc</code></pre>
       <div>
         <h3 class="h-sub text-zinc-900">7. Unquoted Special Characters</h3>
         <p>Strings containing <code>&#123;&#125;</code>, <code>[]</code>, <code>:</code>, <code>&amp;</code>, <code>*</code>, or backslashes get misinterpreted. Double-quote them.</p>
-        <pre><code># BROKEN
+        <pre class="p-4 text-[13px] leading-relaxed overflow-x-auto rounded-lg bg-zinc-50 border border-zinc-200"><code># BROKEN
 path: C:\Users\name   # \U is a unicode escape
 
 # FIXED
