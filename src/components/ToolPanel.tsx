@@ -503,17 +503,25 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
     }
   }, [error, tab]);
 
-  // Load tab from URL hash on mount (e.g. /#yaml-to-json, /#json-to-yaml, /#diff)
+  // Load tab from URL hash on mount and whenever the hash changes
   useEffect(() => {
-    const hash = window.location.hash;
-    const tabMap: Record<string, TabType> = {
-      "#yaml-to-json": "to-json",
-      "#json-to-yaml": "json-to-yaml",
-      "#diff": "diff",
-      "#format": "format",
+    const applyHash = () => {
+      const hash = window.location.hash;
+      const tabMap: Record<string, TabType> = {
+        "#yaml-to-json": "to-json",
+        "#json-to-yaml": "json-to-yaml",
+        "#diff": "diff",
+        "#format": "format",
+      };
+      const target = tabMap[hash];
+      if (target) {
+        setTab(target);
+        document.getElementById("formatter")?.scrollIntoView({ behavior: "smooth" });
+      }
     };
-    const target = tabMap[hash];
-    if (target) setTab(target);
+    applyHash();
+    window.addEventListener("hashchange", applyHash);
+    return () => window.removeEventListener("hashchange", applyHash);
   }, []);
 
   // Load shared YAML from URL hash on mount
