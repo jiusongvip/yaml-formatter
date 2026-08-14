@@ -206,6 +206,16 @@ const JSON_EXAMPLES: Record<string, string> = {
 }`,
 };
 
+const DEFAULT_JSON_INPUT = `{
+  "name": "my-app",
+  "version": "1.0.0",
+  "description": "A sample application",
+  "settings": {
+    "debug": false,
+    "port": 3000
+  }
+}`;
+
 type TabType = "format" | "to-json" | "json-to-yaml" | "diff" | "schema";
 
 // Error line highlight effect
@@ -332,6 +342,8 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
   const inputRef = useRef<HTMLDivElement>(null);
   const inputEditor = useRef<EditorView | null>(null);
   const editorParentRef = useRef<HTMLDivElement>(null);
+  const inputsRef = useRef<Partial<Record<TabType, string>>>({});
+  const suppressChangeRef = useRef(false);
 
   const processYAML = useCallback(
     (value: string) => {
@@ -432,6 +444,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
 
     const dom = editor.dom;
     dom.addEventListener("cm-change", ((e: Event) => {
+      if (suppressChangeRef.current) return;
       const val = (e as CustomEvent).detail as string;
       setInput(val);
       if (autoFormatRef.current) {
@@ -546,6 +559,21 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
   }, []);
 
   const handleTabChange = (newTab: TabType) => {
+    if (newTab === tab) return;
+    // 保存当前 tab 的输入，切回时可恢复
+    inputsRef.current[tab] = input;
+    // 目标 tab 的输入：已保存的优先，否则用默认示例
+    const target = inputsRef.current[newTab] ?? (newTab === "json-to-yaml" ? DEFAULT_JSON_INPUT : DEFAULT_YAML);
+    inputsRef.current[newTab] = target;
+    // 替换编辑器内容（跳过 cm-change 的即时处理，由 useEffect [tab] 统一处理）
+    suppressChangeRef.current = true;
+    if (inputEditor.current) {
+      inputEditor.current.dispatch({
+        changes: { from: 0, to: inputEditor.current.state.doc.length, insert: target },
+      });
+    }
+    suppressChangeRef.current = false;
+    setInput(target);
     setTab(newTab);
   };
 
