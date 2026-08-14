@@ -746,7 +746,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
           <div className="relative h-[440px] lg:h-[520px]">
             {/* Mode indicator */}
             {tab !== "format" && (
-              <div className="absolute top-2 left-2 z-10">
+              <div className="absolute top-2 left-2 z-10 select-none pointer-events-none">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-md bg-blue-100 text-blue-700 border border-blue-200">
                   {tab === "to-json" ? "YAML → JSON" : tab === "json-to-yaml" ? "JSON → YAML" : tab === "diff" ? "Diff" : "Schema"}
                 </span>
@@ -851,7 +851,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
             )}
             </div>
             {output && !error && tab !== "diff" && tab !== "schema" && (
-              <div className="absolute bottom-3 right-3 z-10">
+              <div className="absolute bottom-3 right-3 z-10 select-none">
                 <button onClick={handleCopy}
                   className="flex items-center gap-2 px-4 py-2 text-base font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
