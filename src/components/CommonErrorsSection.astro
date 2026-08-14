@@ -1,0 +1,85 @@
+---
+---
+
+<section id="yaml-errors" class="section band-soft">
+  <div class="container-tool max-w-3xl">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <p class="eyebrow">Troubleshooting</p>
+      <h2 class="h-section mt-3">7 Common YAML Errors (and How to Fix Them)</h2>
+      <p class="lead mt-4">YAML's readability comes at a cost: whitespace sensitivity. Here are the seven errors developers hit most often — and exactly how to fix each one.</p>
+    </div>
+    <div class="space-y-6 text-zinc-600 leading-relaxed">
+      <div>
+        <h3 class="h-sub text-zinc-900">1. Tabs Instead of Spaces</h3>
+        <p>YAML forbids tabs for indentation, but many editors insert them silently. The parser throws "found character that cannot start any token." Configure your editor to insert spaces (<code>"editor.insertSpaces": true</code> in VS Code) and use a <a href="/#formatter">YAML formatter</a> to auto-detect tabs.</p>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">2. Inconsistent Indentation Levels</h3>
+        <p>Mixing 2-space and 4-space indentation confuses the parser about nesting, silently moving keys to the wrong level.</p>
+        <pre><code># BROKEN (mixed indentation)
+server:
+  host: localhost
+    port: 8080   # nested under host instead of server
+
+# FIXED
+server:
+  host: localhost
+  port: 8080</code></pre>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">3. Missing Space After Colon</h3>
+        <p>Without a space after the colon, the whole pair is read as a single string instead of a mapping.</p>
+        <pre><code># BROKEN
+name:John Doe
+
+# FIXED
+name: John Doe</code></pre>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">4. Accidental Boolean Conversion (The Norway Problem)</h3>
+        <p>In YAML 1.1, values like <code>NO</code>, <code>YES</code>, <code>ON</code>, and <code>OFF</code> become booleans. Always quote ambiguous strings and use <code>true/false</code> for booleans.</p>
+        <pre><code># DANGEROUS in YAML 1.1
+country: NO    # becomes boolean false
+
+# SAFE
+country: "NO"</code></pre>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">5. Broken Anchors and Aliases</h3>
+        <p>A typo in an alias name (<code>*defalts</code> instead of <code>*defaults</code>) fails the parse, while an unresolved merge silently drops keys. Validate that every <code>*alias</code> has a matching <code>&amp;anchor</code>.</p>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">6. Multi-Document Separator Issues</h3>
+        <p>Content after a <code>...</code> end-of-stream marker is invalid, and a bare <code>---</code> at the top starts a new document. Keep separators on their own lines.</p>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">7. Unquoted Special Characters</h3>
+        <p>Strings containing <code>&#123;&#125;</code>, <code>[]</code>, <code>:</code>, <code>&amp;</code>, <code>*</code>, or backslashes get misinterpreted. Double-quote them.</p>
+        <pre><code># BROKEN
+path: C:\Users\name   # \U is a unicode escape
+
+# FIXED
+path: "C:\\Users\\name"</code></pre>
+      </div>
+
+      <h3 class="h-sub text-zinc-900">YAML Error Prevention Checklist</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>Editor configured:</strong> spaces only, 2-space indent, show invisible characters.</li>
+        <li><strong>Consistent indentation:</strong> the same number of spaces at every level.</li>
+        <li><strong>Colons have trailing spaces:</strong> every <code>key: value</code> pair.</li>
+        <li><strong>Ambiguous values quoted:</strong> country codes, version strings, yes/no values.</li>
+        <li><strong>Anchors resolve:</strong> every <code>*alias</code> matches an <code>&amp;anchor</code>.</li>
+        <li><strong>Validated with a linter:</strong> run through a <a href="/#formatter">YAML validator</a> before committing.</li>
+      </ul>
+
+      <h3 class="h-sub text-zinc-900">Real-World Impact</h3>
+      <p>YAML errors cause real outages. A tab in a ConfigMap leaves a pod in <code>CrashLoopBackOff</code>; a <code>yes</code> parsed as a boolean makes a GitHub Actions condition always true; a misplaced <code>ports</code> key makes Docker Compose silently ignore it. The fastest fix: paste the file into an <a href="/#formatter">online YAML validator</a> and get the exact line and column of the first error.</p>
+    </div>
+  </div>
+</section>

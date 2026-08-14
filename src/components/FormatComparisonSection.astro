@@ -1,0 +1,75 @@
+---
+---
+
+<section id="format-comparison" class="section">
+  <div class="container-tool max-w-3xl">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <p class="eyebrow">Comparison</p>
+      <h2 class="h-section mt-3">YAML vs JSON vs TOML: Which Format Should You Use?</h2>
+      <p class="lead mt-4">Three formats dominate configuration files. Here's a practical comparison to help you choose the right one for each job.</p>
+    </div>
+    <div class="space-y-6 text-zinc-600 leading-relaxed">
+      <div class="overflow-x-auto tool-card">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-zinc-50 text-left text-zinc-500">
+              <th class="px-3 py-2.5 font-semibold">Feature</th>
+              <th class="px-3 py-2.5 font-semibold text-blue-700">YAML</th>
+              <th class="px-3 py-2.5 font-semibold">JSON</th>
+              <th class="px-3 py-2.5 font-semibold">TOML</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-t border-zinc-100"><td class="px-3 py-2 font-medium">Readability</td><td class="px-3 py-2 text-blue-600">Excellent</td><td class="px-3 py-2 text-amber-600">Good</td><td class="px-3 py-2 text-blue-600">Excellent</td></tr>
+            <tr class="border-t border-zinc-100"><td class="px-3 py-2 font-medium">Comments</td><td class="px-3 py-2 text-blue-600">Yes (#)</td><td class="px-3 py-2 text-red-600">No</td><td class="px-3 py-2 text-blue-600">Yes (#)</td></tr>
+            <tr class="border-t border-zinc-100"><td class="px-3 py-2 font-medium">Anchors/Aliases</td><td class="px-3 py-2 text-blue-600">Yes</td><td class="px-3 py-2 text-red-600">No</td><td class="px-3 py-2 text-red-600">No</td></tr>
+            <tr class="border-t border-zinc-100"><td class="px-3 py-2 font-medium">Whitespace-sensitive</td><td class="px-3 py-2 text-red-600">Yes</td><td class="px-3 py-2 text-blue-600">No</td><td class="px-3 py-2 text-blue-600">No</td></tr>
+            <tr class="border-t border-zinc-100"><td class="px-3 py-2 font-medium">Multi-document</td><td class="px-3 py-2 text-blue-600">Yes (---)</td><td class="px-3 py-2 text-red-600">No</td><td class="px-3 py-2 text-red-600">No</td></tr>
+            <tr class="border-t border-zinc-100"><td class="px-3 py-2 font-medium">Ecosystem</td><td class="px-3 py-2">DevOps, K8s, CI/CD</td><td class="px-3 py-2">APIs, Web, JS/TS</td><td class="px-3 py-2">Rust, Python</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">When to Use YAML</h3>
+        <p>YAML dominates the DevOps and cloud-native ecosystem: Kubernetes manifests, Docker Compose, GitHub Actions, Ansible, OpenAPI, and Helm charts. <strong>Strengths:</strong> most human-readable for nested structures, supports comments, anchors, and multi-document files. <strong>Weaknesses:</strong> whitespace sensitivity leads to subtle bugs, and parsing is slower than JSON.</p>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">When to Use JSON</h3>
+        <p>JSON is the universal data-exchange format: REST APIs, <code>package.json</code>, NoSQL databases, and native browser support. <strong>Strengths:</strong> fast to parse everywhere, strict unambiguous syntax, universal language support. <strong>Weaknesses:</strong> no comments, no anchors, verbose brackets and commas.</p>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">When to Use TOML</h3>
+        <p>TOML (Tom's Obvious, Minimal Language) is rising in language ecosystems: <code>Cargo.toml</code> for Rust and <code>pyproject.toml</code> for Python. <strong>Strengths:</strong> clear section headers, less whitespace-sensitive, short spec. <strong>Weaknesses:</strong> awkward for deep nesting, smaller ecosystem, no anchors.</p>
+      </div>
+
+      <div class="overflow-x-auto tool-card">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-zinc-50 text-left text-zinc-500">
+              <th class="px-3 py-2.5 font-semibold">Scenario</th>
+              <th class="px-3 py-2.5 font-semibold">Recommendation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-t border-zinc-100"><td class="px-3 py-2">Kubernetes / Docker / CI/CD</td><td class="px-3 py-2 font-medium text-blue-600">YAML</td></tr>
+            <tr class="border-t border-zinc-100"><td class="px-3 py-2">REST API payloads</td><td class="px-3 py-2 font-medium">JSON</td></tr>
+            <tr class="border-t border-zinc-100"><td class="px-3 py-2">Rust / Python projects</td><td class="px-3 py-2 font-medium text-amber-600">TOML</td></tr>
+            <tr class="border-t border-zinc-100"><td class="px-3 py-2">Complex nested configs with reuse</td><td class="px-3 py-2 font-medium text-blue-600">YAML (anchors)</td></tr>
+            <tr class="border-t border-zinc-100"><td class="px-3 py-2">Flat, simple configuration</td><td class="px-3 py-2 font-medium text-amber-600">TOML</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">Migrating Between Formats</h3>
+        <p><strong>JSON to YAML</strong> — remove brackets, replace commas with newlines, add indentation. <strong>YAML to JSON</strong> — add brackets, commas, and quotes. Both are one click with our <a href="/#yaml-to-json">YAML to JSON</a> and <a href="/#json-to-yaml">JSON to YAML</a> converters.</p>
+      </div>
+
+      <h3 class="h-sub text-zinc-900">The Bottom Line</h3>
+      <p>There's no single winner. <strong>YAML</strong> dominates DevOps and cloud infrastructure. <strong>JSON</strong> owns APIs and the web. <strong>TOML</strong> is rising in language ecosystems. If you work with Kubernetes, Docker, or CI/CD, YAML is unavoidable — make it easier with our <a href="/#formatter">YAML formatter</a>, running entirely in your browser.</p>
+    </div>
+  </div>
+</section>
