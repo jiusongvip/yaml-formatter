@@ -546,27 +546,6 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
   }, []);
 
   const handleTabChange = (newTab: TabType) => {
-    const trimmed = input.trim();
-    // When switching to a tab that expects a different input format, clear if incompatible
-    if (newTab === "json-to-yaml" && trimmed && !trimmed.startsWith("{") && !trimmed.startsWith("[")) {
-      setInput("");
-      setOutput("");
-      setError(null);
-      if (inputEditor.current) {
-        inputEditor.current.dispatch({
-          changes: { from: 0, to: inputEditor.current.state.doc.length, insert: "" },
-        });
-      }
-    } else if ((newTab === "format" || newTab === "to-json" || newTab === "diff") && trimmed && (trimmed.startsWith("{") || trimmed.startsWith("["))) {
-      setInput("");
-      setOutput("");
-      setError(null);
-      if (inputEditor.current) {
-        inputEditor.current.dispatch({
-          changes: { from: 0, to: inputEditor.current.state.doc.length, insert: "" },
-        });
-      }
-    }
     setTab(newTab);
   };
 
