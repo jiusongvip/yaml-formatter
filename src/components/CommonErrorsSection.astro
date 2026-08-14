@@ -68,16 +68,6 @@ path: C:\Users\name   # \U is a unicode escape
 path: "C:\\Users\\name"</code></pre>
       </div>
 
-      <h3 class="h-sub text-zinc-900">YAML Error Prevention Checklist</h3>
-      <ul class="list-disc pl-5 space-y-1">
-        <li><strong>Editor configured:</strong> spaces only, 2-space indent, show invisible characters.</li>
-        <li><strong>Consistent indentation:</strong> the same number of spaces at every level.</li>
-        <li><strong>Colons have trailing spaces:</strong> every <code>key: value</code> pair.</li>
-        <li><strong>Ambiguous values quoted:</strong> country codes, version strings, yes/no values.</li>
-        <li><strong>Anchors resolve:</strong> every <code>*alias</code> matches an <code>&amp;anchor</code>.</li>
-        <li><strong>Validated with a linter:</strong> run through a <a href="/#formatter">YAML validator</a> before committing.</li>
-      </ul>
-
       <h3 class="h-sub text-zinc-900">Real-World Impact</h3>
       <p>YAML errors cause real outages. A tab in a ConfigMap leaves a pod in <code>CrashLoopBackOff</code>; a <code>yes</code> parsed as a boolean makes a GitHub Actions condition always true; a misplaced <code>ports</code> key makes Docker Compose silently ignore it. The fastest fix: paste the file into an <a href="/#formatter">online YAML validator</a> and get the exact line and column of the first error.</p>
     </div>

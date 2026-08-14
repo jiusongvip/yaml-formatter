@@ -1,0 +1,79 @@
+---
+---
+
+<section id="yaml-guide" class="section">
+  <div class="container-tool max-w-3xl">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <p class="eyebrow">YAML guide</p>
+      <h2 class="h-section mt-3">Understanding YAML</h2>
+      <p class="lead mt-4">Everything you need to write clean, valid YAML — from first principles to best practices.</p>
+    </div>
+    <div class="space-y-6 text-zinc-600 leading-relaxed">
+      <div>
+        <h3 class="h-sub text-zinc-900">What is YAML?</h3>
+        <p>YAML (YAML Ain't Markup Language) is a human-readable data serialization format used for configuration files. Unlike JSON, which uses braces and quotes, YAML uses indentation to express structure — making it far easier to read and write by hand. That readability is why it's the default configuration language across the DevOps ecosystem.</p>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">Why YAML is so easy to break</h3>
+        <p>YAML's readability comes at a price: it is extremely sensitive to whitespace. A tab instead of spaces, an inconsistent indentation level, or a missing space after a colon can cause a parse failure — or worse, a <em>silent</em> error where the parser reads your structure differently than you intended. A formatter solves this by normalizing indentation and validating syntax with precise error locations.</p>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">The basic building blocks</h3>
+        <p><strong>Scalars</strong> are simple values — strings, numbers, booleans, and null. <strong>Mappings</strong> map keys to values with colons. <strong>Sequences</strong> are ordered lists denoted by dashes.</p>
+        <pre><code># Scalars
+name: John Doe
+age: 30
+enabled: true
+
+# Mapping (key-value pairs)
+person:
+  name: Alice
+  address:
+    street: 123 Main St
+
+# Sequence (list)
+fruits:
+  - apple
+  - banana
+  - orange</code></pre>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">Advanced features: anchors and multi-document files</h3>
+        <p><strong>Anchors</strong> (<code>&amp;</code>) mark a node for reuse and <strong>aliases</strong> (<code>*</code>) reference it — ideal for DRY configuration. <strong>Multi-document files</strong> hold several documents separated by <code>---</code>, common in Kubernetes manifests.</p>
+        <pre><code># Anchors and aliases
+defaults: &amp;defaults
+  timeout: 30
+  retries: 3
+
+service-a:
+  &lt;&lt;: *defaults
+  name: service-a
+
+# Multi-document file
+---
+kind: Service
+metadata:
+  name: my-service
+---
+kind: Deployment
+metadata:
+  name: my-deployment</code></pre>
+      </div>
+
+      <div>
+        <h3 class="h-sub text-zinc-900">Best practices</h3>
+        <ul class="list-disc pl-5 space-y-1">
+          <li><strong>Always use spaces</strong> for indentation — never tabs, and never mix levels.</li>
+          <li><strong>Quote ambiguous strings</strong> like <code>"true"</code>, <code>"1.0"</code>, or version numbers to prevent type coercion.</li>
+          <li><strong>Use comments liberally</strong> — YAML supports <code>#</code> comments.</li>
+          <li><strong>Keep nesting shallow</strong> — deeply nested YAML is hard to read and error-prone.</li>
+          <li><strong>Use anchors for repeated blocks</strong> instead of copying configuration.</li>
+          <li><strong>Validate before committing</strong> — a <a href="/#formatter">YAML validator</a> catches syntax errors before they reach production.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
