@@ -543,6 +543,7 @@ export default function ToolPanel({ initialTab = "format", initialInput = DEFAUL
         "#json-to-yaml": "json-to-yaml",
         "#diff": "diff",
         "#format": "format",
+        "#formatter": "format",
       };
       const target = tabMap[hash];
       if (target) {
