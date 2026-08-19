@@ -15,8 +15,8 @@
 
 ## Pages
 
-- [Home / YAML Formatter](https://yaml-formatter.com/): The single-page tool with all capabilities — Format, YAML to JSON, YAML to TOML, YAML to XML, JSON to YAML, Diff, Schema, and Tree tabs
-- [Privacy Policy](https://yaml-formatter.com/privacy/): How the tool handles data (all processing is client-side)
+- [Home / YAML Formatter](https://www.yaml-formatter.com/): The single-page tool with all capabilities — Format, YAML to JSON, YAML to TOML, YAML to XML, JSON to YAML, Diff, Schema, and Tree tabs
+- [Privacy Policy](https://www.yaml-formatter.com/privacy/): How the tool handles data (all processing is client-side)
 
 ## Notes
 

@@ -6,8 +6,8 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   integrations: [preact({ compat: true }), sitemap()],
   output: 'static',
-  site: 'https://yaml-formatter.com',
-  trailingSlash: 'never',
+  site: 'https://www.yaml-formatter.com',
+  trailingSlash: 'always',
   vite: {
     plugins: [tailwindcss()],
   },

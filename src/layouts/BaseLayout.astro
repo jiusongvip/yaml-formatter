@@ -7,7 +7,9 @@ export interface Props {
 }
 
 const { title, description } = Astro.props;
-const canonicalURL = new URL(Astro.url.pathname || '/', Astro.site).href.replace(/\/$/, '');
+const canonicalURL = Astro.url.pathname === '/'
+  ? new URL('/', Astro.site).href.replace(/\/$/, '')
+  : new URL(Astro.url.pathname, Astro.site).href;
 ---
 
 <!doctype html>
@@ -33,14 +35,14 @@ const canonicalURL = new URL(Astro.url.pathname || '/', Astro.site).href.replace
     <meta property="og:site_name" content="YAML Formatter" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:url" content={canonicalURL} />
-    <meta property="og:image" content="https://yaml-formatter.com/og-image.png" />
+    <meta property="og:image" content="https://www.yaml-formatter.com/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={title} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content="https://yaml-formatter.com/og-image.png" />
+    <meta name="twitter:image" content="https://www.yaml-formatter.com/og-image.png" />
   </head>
   <body class="bg-white text-zinc-800 antialiased">
     <slot />
