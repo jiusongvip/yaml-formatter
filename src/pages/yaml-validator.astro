@@ -1,0 +1,250 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const faq = [
+  {
+    q: 'How do I check if a YAML file is valid?',
+    a: 'Paste the contents above, or drop the file on the box. A valid document reports the number of documents and top-level keys it found; an invalid one stops at the first problem and gives you the line and column plus the parser message.',
+  },
+  {
+    q: 'Is there a free online YAML validator with no upload?',
+    a: 'This one. Validation happens in your browser using a YAML 1.2 parser, so the file is never transmitted. You can confirm it by switching your network off after the page loads — checking still works.',
+  },
+  {
+    q: 'Why does my YAML fail on a line that looks correct?',
+    a: 'Usually the line above it. YAML decides structure from indentation, so one misplaced space changes which block a key belongs to, and the parser only notices when it reaches a token that cannot fit the structure.',
+  },
+  {
+    q: 'Can I validate a Kubernetes or docker-compose file here?',
+    a: 'Yes. Multi-document files separated by --- are counted and each document is checked, which covers a Kubernetes manifest with several resources. Schema-level rules are a different job: this checks that the file is well-formed YAML, not that a field is allowed by Kubernetes.',
+  },
+  {
+    q: 'Does the validator accept tabs for indentation?',
+    a: 'No, and neither does YAML. Tabs are forbidden as indentation in the specification, so a file that looks aligned in your editor can still fail. Converting tabs to spaces fixes it.',
+  },
+  {
+    q: 'What is the difference between validating and formatting?',
+    a: 'Validation answers whether the parser accepts the document and where it breaks. Formatting additionally rewrites the file with normalised indentation and spacing. The formatter on the home page does both, and shows a diff of what changed.',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'YAML Validator',
+      url: 'https://www.yaml-formatter.com/yaml-validator/',
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'Any',
+      description: 'Validate YAML online. Paste a document or drop a file and get a pass or fail with the exact line and column, plus a count of documents and top-level keys. Runs entirely in the browser.',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      browserRequirements: 'Requires JavaScript',
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faq.map((item) => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: { '@type': 'Answer', text: item.a },
+      })),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.yaml-formatter.com/' },
+        { '@type': 'ListItem', position: 2, name: 'YAML Validator', item: 'https://www.yaml-formatter.com/yaml-validator/' },
+      ],
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="YAML Validator - Check YAML Syntax Online Free, No Upload"
+  description="Validate YAML online free. Paste a file or drop it in and get a pass or fail with the exact line and column, document count and top-level keys. 100% client-side."
+>
+  <Header />
+  <main>
+    <section class="section">
+      <div class="container-tool">
+        <p class="eyebrow">Validator</p>
+        <h1 class="mt-3 text-3xl md:text-4xl font-bold tracking-tight text-zinc-900">YAML Validator</h1>
+        <p class="lead mt-5 max-w-3xl">Drop a file or paste your YAML and the parser reports either a pass with a structural summary, or the first place it breaks — line, column, and the message. Nothing is uploaded, so a production manifest is as safe to check here as a toy example.</p>
+
+        <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div class="tool-card p-4">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-xs font-semibold uppercase tracking-wider text-zinc-500" for="yaml-in">YAML input</label>
+              <button type="button" id="paste-in" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50">Paste</button>
+            </div>
+            <textarea id="yaml-in" class="w-full rounded-xl border border-zinc-200 bg-zinc-50 p-4 font-mono text-[13px] leading-relaxed text-zinc-800 focus:border-blue-400 focus:bg-white focus:outline-none" rows="18" spellcheck="false" aria-label="YAML input">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27</textarea>
+          </div>
+          <div class="tool-card p-4 flex flex-col justify-center">
+            <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">Result</p>
+            <div id="verdict" class="rounded-xl px-4 py-4 text-base font-semibold bg-emerald-50 text-emerald-700">Valid YAML</div>
+            <dl class="mt-4 space-y-2 text-sm" id="summary">
+              <div class="flex justify-between gap-4 border-b border-zinc-100 pb-2"><dt class="text-zinc-500">Documents</dt><dd id="doc-count" class="font-mono text-zinc-800">1</dd></div>
+              <div class="flex justify-between gap-4 border-b border-zinc-100 pb-2"><dt class="text-zinc-500">Top-level keys</dt><dd id="key-count" class="font-mono text-zinc-800">3</dd></div>
+              <div class="flex justify-between gap-4"><dt class="text-zinc-500">Lines</dt><dd id="line-count" class="font-mono text-zinc-800">11</dd></div>
+            </dl>
+            <p class="mt-4 text-xs text-zinc-500" id="err-detail"></p>
+          </div>
+        </div>
+        <p class="mt-3 text-xs text-zinc-500">Checking starts as soon as you type — there is no button to press, and no file to submit.</p>
+      </div>
+    </section>
+
+    <section class="section band-soft">
+      <div class="container-tool">
+        <h2 class="h-section">The YAML errors that actually catch people</h2>
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+          {[
+            { t: 'Tabs instead of spaces', d: 'YAML reserves the tab character for content, not structure. A file indented with tabs can look perfect in an editor and still be rejected.', e: ' Paste → convert tabs to spaces, then re-check.' },
+            { t: 'A colon inside an unquoted value', d: 'A colon followed by a space starts a mapping, so "summary: Deploy v2: fast" is read as a value that is itself a map. YAML rejects that combination outright, and the message talks about nested mappings.', e: ' Wrap the value in double quotes.' },
+            { t: 'Indentation off by one space', d: 'A nested key one space short of its siblings stops belonging to its parent. This one does complain — "all mapping items must start at the same column" — but it names the offending line, not the key you broke.', e: ' Compare the column of the failing key against its siblings.' },
+            { t: 'Duplicate keys in one mapping', d: 'The same key twice in a block is an error rather than an overwrite, because the second value would silently win in some tools and be ignored in others.', e: ' Rename or merge the two entries.' },
+            { t: 'A quote that never closes', d: 'One stray quote swallows the rest of the file as a single string, so the error lands far below the mistake.', e: ' Search backwards from the reported line for an unpaired quote.' },
+            { t: 'A missing space after a dash', d: 'A sequence separator is a dash and a space. Put a key straight after the dash — "-name: x" — and YAML accepts it as a key literally called "-name": no error, just a file that is quietly not the list you meant.', e: ' Change "-name: x" to "- name: x" and compare the key count above.' },
+          ].map(({ t, d, e }) => (
+            <div class="tool-card p-5">
+              <h3 class="h-sub">{t}</h3>
+              <p class="mt-2 text-sm text-zinc-600 leading-relaxed">{d}</p>
+              <p class="mt-2 text-xs text-blue-700">{e}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container-tool max-w-3xl">
+        <h2 class="h-section text-center">Frequently asked questions</h2>
+        <div class="mt-8 space-y-2">
+          {faq.map((item) => (
+            <details class="rounded-xl border border-zinc-200 bg-white">
+              <summary class="cursor-pointer px-5 py-4 text-sm font-medium text-zinc-900">{item.q}</summary>
+              <div class="px-5 pb-4 text-sm leading-relaxed text-zinc-600">{item.a}</div>
+            </details>
+          ))}
+        </div>
+
+        <div class="mt-12 rounded-2xl border border-zinc-200 p-6">
+          <h2 class="h-sub">Keep going</h2>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a href="/" class="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:border-blue-300 hover:text-blue-700 no-underline">YAML Formatter</a>
+            <a href="/yaml-to-json/" class="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:border-blue-300 hover:text-blue-700 no-underline">YAML to JSON</a>
+            <a href="/json-to-yaml/" class="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:border-blue-300 hover:text-blue-700 no-underline">JSON to YAML</a>
+            <a href="/#common-errors" class="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:border-blue-300 hover:text-blue-700 no-underline">Common errors in depth</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</BaseLayout>
+
+<script>
+  import { parseDocument } from 'yaml';
+  import { splitDocuments } from '../lib/yaml';
+
+  const inEl = document.getElementById('yaml-in') as HTMLTextAreaElement;
+  const verdict = document.getElementById('verdict')!;
+  const errDetail = document.getElementById('err-detail')!;
+  const docCount = document.getElementById('doc-count')!;
+  const keyCount = document.getElementById('key-count')!;
+  const lineCount = document.getElementById('line-count')!;
+
+  const OK = 'rounded-xl px-4 py-4 text-base font-semibold bg-emerald-50 text-emerald-700';
+  const BAD = 'rounded-xl px-4 py-4 text-base font-semibold bg-red-50 text-red-700';
+
+  const clean = (message: string) => message.split('\n')[0].replace(/ at line \d+, column \d+:?\s*$/, '');
+
+  let timer: number | undefined;
+
+  function check() {
+    const raw = inEl.value;
+    lineCount.textContent = String(raw ? raw.split('\n').length : 0);
+    if (!raw.trim()) {
+      verdict.textContent = 'Waiting for input';
+      verdict.className = OK.replace('bg-emerald-50 text-emerald-700', 'bg-zinc-50 text-zinc-500');
+      errDetail.textContent = '';
+      docCount.textContent = '0';
+      keyCount.textContent = '0';
+      return;
+    }
+    try {
+      const docs = splitDocuments(raw);
+      const problems: Array<{ line: number; col: number; message: string }> = [];
+      let firstKeys = 0;
+      docs.forEach((doc, index) => {
+        const parsed = parseDocument(doc);
+        if (parsed.errors.length > 0) {
+          const err = parsed.errors[0] as { linePos?: Array<{ line: number; col: number }>; message: string };
+          problems.push({
+            line: err.linePos?.[0]?.line ?? 1,
+            col: err.linePos?.[0]?.col ?? 1,
+            message: `${docs.length > 1 ? `Document ${index + 1}: ` : ''}${clean(err.message)}`,
+          });
+        } else if (index === 0) {
+          const value = parsed.toJS();
+          firstKeys = value && typeof value === 'object' && !Array.isArray(value) ? Object.keys(value).length : 0;
+        }
+      });
+      docCount.textContent = String(docs.length);
+      if (problems.length > 0) {
+        verdict.textContent = 'Invalid YAML';
+        verdict.className = BAD;
+        keyCount.textContent = '—';
+        errDetail.textContent = `Line ${problems[0].line}, column ${problems[0].col} — ${problems[0].message}`;
+        return;
+      }
+      verdict.textContent = 'Valid YAML';
+      verdict.className = OK;
+      keyCount.textContent = String(firstKeys);
+      errDetail.textContent = docs.length > 1 ? `${docs.length} documents found, each parsed without error.` : '';
+    } catch (e: unknown) {
+      const err = e as { linePos?: Array<{ line: number; col: number }>; message: string };
+      verdict.textContent = 'Invalid YAML';
+      verdict.className = BAD;
+      docCount.textContent = '—';
+      keyCount.textContent = '—';
+      errDetail.textContent = `Line ${err.linePos?.[0]?.line ?? '?'}, column ${err.linePos?.[0]?.col ?? '?'} — ${clean(err.message)}`;
+    }
+  }
+
+  inEl.addEventListener('input', () => { window.clearTimeout(timer); timer = window.setTimeout(check, 120); });
+
+  inEl.addEventListener('dragover', (e) => e.preventDefault());
+  inEl.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const file = (e as DragEvent).dataTransfer?.files?.[0];
+    if (!file) return;
+    file.text().then((t) => { inEl.value = t; check(); });
+  });
+
+  document.getElementById('paste-in')!.addEventListener('click', async () => {
+    try {
+      inEl.value = await navigator.clipboard.readText();
+      check();
+    } catch {
+      errDetail.textContent = 'Clipboard unavailable — paste into the box instead';
+    }
+  });
+
+  check();
+</script>

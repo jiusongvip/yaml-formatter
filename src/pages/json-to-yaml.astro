@@ -1,0 +1,260 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const sampleJson = `{
+  "service": "api-gateway",
+  "replicas": 3,
+  "ports": [8080, 9090],
+  "canary": true,
+  "labels": {
+    "team": "platform",
+    "tier": "critical"
+  }
+}`;
+
+const faq = [
+  {
+    q: 'Can I convert JSON to YAML online for free?',
+    a: 'Yes. Paste JSON or drop a .json file and readable block-style YAML appears immediately. There is no account, no upload, and no cap on file size beyond what your own browser can hold.',
+  },
+  {
+    q: 'Is the JSON sent to a server?',
+    a: 'No. Parsing happens in your browser with a JavaScript YAML library. After the page loads you can turn off your network and the conversion still works.',
+  },
+  {
+    q: 'Why are some of my strings quoted in the YAML output?',
+    a: 'YAML reads bare words like yes, no, on, off and 8080 as booleans or numbers in some dialects. Quoting them keeps the value a string, so the YAML parses back into the JSON you started with.',
+  },
+  {
+    q: 'Does the YAML keep my key order?',
+    a: 'Yes, by default. Keys come out in the order they appear in the JSON object. The main formatter has a Sort keys option when you want them alphabetised instead.',
+  },
+  {
+    q: 'What happens to JSON features YAML has no equivalent for?',
+    a: 'null becomes null, nested objects become indented blocks, and arrays become dash lists. JSON has no comments, so there is nothing to lose on that front.',
+  },
+  {
+    q: 'Is this the same as the YAML formatter on the home page?',
+    a: 'It is the same engine, pointed the other way. Use this page when JSON is your input; use the formatter when you want YAML cleaned, validated, or converted onward to JSON, TOML or XML.',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'JSON to YAML Converter',
+      url: 'https://www.yaml-formatter.com/json-to-yaml/',
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'Any',
+      description: 'Convert JSON to YAML in the browser. Paste JSON or drop a .json file and get clean block-style YAML, with the failing position reported when the input is not valid JSON.',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      browserRequirements: 'Requires JavaScript',
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faq.map((item) => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: { '@type': 'Answer', text: item.a },
+      })),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.yaml-formatter.com/' },
+        { '@type': 'ListItem', position: 2, name: 'JSON to YAML', item: 'https://www.yaml-formatter.com/json-to-yaml/' },
+      ],
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="JSON to YAML Converter - Free, Runs Entirely in Your Browser"
+  description="Convert JSON to YAML online free. Paste JSON or drop a .json file and get clean block-style YAML that keeps key order and quotes ambiguous strings."
+>
+  <Header />
+  <main>
+    <section class="section">
+      <div class="container-tool">
+        <p class="eyebrow">Converter</p>
+        <h1 class="mt-3 text-3xl md:text-4xl font-bold tracking-tight text-zinc-900">JSON to YAML Converter</h1>
+        <p class="lead mt-5 max-w-3xl">Paste JSON, get YAML. The output is block style with two-space indentation and keys in their original order, so it reads like something a person wrote rather than something a script dumped. Values that YAML would misread as booleans or numbers are quoted, which keeps the round trip exact.</p>
+
+        <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-5" id="converter">
+          <div class="tool-card p-4">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-xs font-semibold uppercase tracking-wider text-zinc-500" for="json-in">JSON input</label>
+              <button type="button" id="paste-json" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50">Paste</button>
+            </div>
+            <textarea id="json-in" class="w-full rounded-xl border border-zinc-200 bg-zinc-50 p-4 font-mono text-[13px] leading-relaxed text-zinc-800 focus:border-blue-400 focus:bg-white focus:outline-none" rows="16" spellcheck="false" aria-label="JSON input" set:html={sampleJson}></textarea>
+            <p class="mt-2 text-xs text-zinc-500" id="json-status" aria-live="polite"></p>
+          </div>
+          <div class="tool-card p-4">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-xs font-semibold uppercase tracking-wider text-zinc-500" for="yaml-out">YAML output</label>
+              <div class="flex items-center gap-2">
+                <button type="button" id="copy-yaml" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50">Copy</button>
+                <button type="button" id="download-yaml" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50">Download .yaml</button>
+              </div>
+            </div>
+            <textarea id="yaml-out" class="w-full rounded-xl border border-zinc-200 bg-zinc-50 p-4 font-mono text-[13px] leading-relaxed text-zinc-800 focus:border-blue-400 focus:bg-white focus:outline-none" rows="16" spellcheck="false" readonly aria-label="YAML output"></textarea>
+            <p class="mt-2 text-xs text-zinc-500" id="out-status" aria-live="polite"></p>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <button type="button" id="swap" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50">Convert the other way: YAML to JSON</button>
+          <span class="text-xs text-zinc-500">Drag and drop a .json, .yaml or .yml file onto the input and the direction is detected for you.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section band-soft">
+      <div class="container-tool">
+        <h2 class="h-section">How to convert JSON to YAML</h2>
+        <ol class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-5 list-none p-0">
+          <li class="tool-card p-5">
+            <h3 class="h-sub">1. Put JSON in</h3>
+            <p class="mt-2 text-sm text-zinc-600 leading-relaxed">From an API response, a package.json, a Terraform plan, a settings export — paste it or drop the file.</p>
+          </li>
+          <li class="tool-card p-5">
+            <h3 class="h-sub">2. Watch it become YAML</h3>
+            <p class="mt-2 text-sm text-zinc-600 leading-relaxed">Objects turn into indented blocks, arrays into dash lists. Invalid JSON reports the position rather than producing half a document.</p>
+          </li>
+          <li class="tool-card p-5">
+            <h3 class="h-sub">3. Copy it into your config</h3>
+            <p class="mt-2 text-sm text-zinc-600 leading-relaxed">Copy the output or save it as .yaml. Because nothing leaves the browser, a production config is no riskier here than a test one.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container-tool">
+        <h2 class="h-section">Why move JSON into YAML</h2>
+        <div class="mt-6 space-y-4 text-sm leading-relaxed text-zinc-600 max-w-3xl">
+          <p><strong class="text-zinc-800">Config you are meant to read.</strong> Kubernetes manifests, docker-compose files, GitHub Actions workflows and Ansible playbooks are all YAML-first. A JSON blob handed to any of them works, but nobody reviewing the pull request will enjoy it.</p>
+          <p><strong class="text-zinc-800">Fewer braces, more structure.</strong> YAML expresses the same tree with indentation instead of braces and quotes, which is why it wins for hand-edited files. This converter keeps that output readable rather than mechanically dumping a single line.</p>
+          <p><strong class="text-zinc-800">A starting point, not the finish.</strong> Once the shape is YAML you can add comments, pull repeated blocks into anchors, and split a long file into documents separated by <code class="text-xs">---</code> — none of which JSON allows.</p>
+        </div>
+
+        <h2 class="h-section mt-14">Frequently asked questions</h2>
+        <div class="mt-6 space-y-2">
+          {faq.map((item) => (
+            <details class="rounded-xl border border-zinc-200 bg-white">
+              <summary class="cursor-pointer px-5 py-4 text-sm font-medium text-zinc-900">{item.q}</summary>
+              <div class="px-5 pb-4 text-sm leading-relaxed text-zinc-600">{item.a}</div>
+            </details>
+          ))}
+        </div>
+
+        <div class="mt-12 rounded-2xl border border-zinc-200 p-6">
+          <h2 class="h-sub">Keep going</h2>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a href="/" class="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:border-blue-300 hover:text-blue-700 no-underline">YAML Formatter</a>
+            <a href="/yaml-validator/" class="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:border-blue-300 hover:text-blue-700 no-underline">YAML Validator</a>
+            <a href="/yaml-to-json/" class="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:border-blue-300 hover:text-blue-700 no-underline">YAML to JSON</a>
+            <a href="/#yaml-guide" class="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:border-blue-300 hover:text-blue-700 no-underline">YAML syntax guide</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</BaseLayout>
+
+<script>
+  import { jsonToYAML, yamlToJSON, detectInputFormat } from '../lib/yaml';
+
+  const inEl = document.getElementById('json-in') as HTMLTextAreaElement;
+  const outEl = document.getElementById('yaml-out') as HTMLTextAreaElement;
+  const inStatus = document.getElementById('json-status')!;
+  const outStatus = document.getElementById('out-status')!;
+  const swapBtn = document.getElementById('swap')!;
+
+  let reverse = false;
+  let timer: number | undefined;
+
+  function run() {
+    const raw = inEl.value;
+    if (!raw.trim()) { outEl.value = ''; inStatus.textContent = ''; return; }
+    const res = reverse ? yamlToJSON(raw) : jsonToYAML(raw);
+    if (res.valid) {
+      outEl.value = res.result;
+      inStatus.textContent = reverse ? 'Valid YAML — converted to JSON' : 'Valid JSON — converted to YAML';
+      inStatus.className = 'mt-2 text-xs text-emerald-600';
+    } else {
+      outEl.value = '';
+      const reason = res.error?.message.split('\n')[0].replace(/ at line \d+, column \d+:?\s*$/, '');
+      inStatus.textContent = reverse
+        ? `Line ${res.error?.line}, column ${res.error?.col}: ${reason}`
+        : `Invalid JSON: ${reason ?? 'check the syntax'}`;
+      inStatus.className = 'mt-2 text-xs text-red-600';
+    }
+  }
+
+  inEl.addEventListener('input', () => { window.clearTimeout(timer); timer = window.setTimeout(run, 120); });
+
+  inEl.addEventListener('dragover', (e) => e.preventDefault());
+  inEl.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const file = (e as DragEvent).dataTransfer?.files?.[0];
+    if (!file) return;
+    file.text().then((t) => {
+      inEl.value = t;
+      reverse = detectInputFormat(t) === 'yaml';
+      sync();
+      run();
+    });
+  });
+
+  function sync() {
+    document.querySelector('#converter label[for="json-in"]')!.textContent = reverse ? 'YAML input' : 'JSON input';
+    document.querySelector('#converter label[for="yaml-out"]')!.textContent = reverse ? 'JSON output' : 'YAML output';
+    swapBtn.textContent = reverse ? 'Convert the other way: JSON to YAML' : 'Convert the other way: YAML to JSON';
+  }
+
+  document.getElementById('paste-json')!.addEventListener('click', async () => {
+    try {
+      inEl.value = await navigator.clipboard.readText();
+      run();
+    } catch {
+      inStatus.textContent = 'Clipboard unavailable — paste into the box instead';
+    }
+  });
+
+  document.getElementById('copy-yaml')!.addEventListener('click', async () => {
+    if (!outEl.value) return;
+    await navigator.clipboard.writeText(outEl.value);
+    outStatus.textContent = 'Copied';
+    window.setTimeout(() => { outStatus.textContent = ''; }, 1800);
+  });
+
+  document.getElementById('download-yaml')!.addEventListener('click', () => {
+    if (!outEl.value) return;
+    const blob = new Blob([outEl.value], { type: reverse ? 'application/json' : 'text/yaml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = reverse ? 'converted.json' : 'converted.yaml';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  swapBtn.addEventListener('click', () => {
+    reverse = !reverse;
+    const previous = outEl.value;
+    sync();
+    if (previous) { inEl.value = previous; outEl.value = ''; }
+    run();
+  });
+
+  run();
+</script>
